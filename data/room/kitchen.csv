@@ -1,0 +1,7 @@
+﻿quantity;device;power [W];total power [W];scalable
+1;Light;20;20;True
+1;Pump;20;20;True
+1;Fridge;120;120;True
+1;Microwave;800;800;True
+1;Water boiler;2000;2000;True
+1;Dish washer;3000;3000;True

@@ -1,0 +1,3 @@
+﻿quantity;device;power [W];total power [W];scalable
+1;Light;20;20;True
+1;Ceiling Fan;60;60;True

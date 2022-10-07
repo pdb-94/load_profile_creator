@@ -1,0 +1,8 @@
+﻿device;CT;
+load type;cycle;
+nominal power [W];18000;
+standby power [W];2500;
+normalized standby power;0,138888889;
+source;"Fraunhofer UMSICHT Hospital Engineering - Teilprojekt ""Energieeffizienz""";
+time;power [W];normalized power [%]
+00:00;17171;0,953944444

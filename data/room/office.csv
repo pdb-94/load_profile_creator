@@ -1,0 +1,8 @@
+﻿quantity;device;power [W];total power [W];scalable
+1;Air Condition;1800;1800;True
+2;Computer;2200;2200;True
+2;Monitor;20;80;True
+2;Printer;300;300;True
+2;Light;20;40;True
+1;Lamp;20;40;True
+1;Ceiling Fan;60;60;True
