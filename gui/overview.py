@@ -13,6 +13,9 @@ from PyQt5 import QtCore
 
 
 class Overview(QWidget):
+    """
+    Tab Overview
+    """
     def __init__(self):
         super().__init__()
 

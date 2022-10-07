@@ -15,7 +15,6 @@ class Department:
     """
     Class to create department objects
     """
-
     def __init__(self,
                  env=None,
                  name: str = None,

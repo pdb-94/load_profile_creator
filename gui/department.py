@@ -14,6 +14,9 @@ import datetime as dt
 
 
 class Department(QWidget):
+    """
+    Tab to create Department object
+    """
     def __init__(self):
         super().__init__()
 
@@ -46,4 +49,3 @@ class Department(QWidget):
         self.layout.addWidget(self.overview, 4, 0)
         self.layout.addWidget(self.viewer, 4, 1)
         self.setLayout(self.layout)
-

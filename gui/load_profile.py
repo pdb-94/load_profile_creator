@@ -18,6 +18,9 @@ from gui.plot import *
 
 
 class Load_profile(QWidget):
+    """
+    Tab to display load_profiles
+    """
     def __init__(self):
         super().__init__()
 

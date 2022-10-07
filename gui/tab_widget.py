@@ -35,9 +35,8 @@ import models as md
 
 class TabWidget(QWidget):
     """
-    Class to create the main Window Frame of the HEyDU GUI
+    Class to create the main Window Frame of the LPC GUI
     """
-
     def __init__(self):
         super().__init__()
 

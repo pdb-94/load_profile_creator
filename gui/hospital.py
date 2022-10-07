@@ -13,6 +13,9 @@ from PyQt5.QtCore import *
 
 
 class Hospital(QWidget):
+    """
+    Tab to create Environment object
+    """
     def __init__(self):
         super().__init__()
 

@@ -15,7 +15,7 @@ import models as md
 
 class Environment:
     """
-
+    Top level class of LPC
     """
     def __init__(self,
                  name: str = None,

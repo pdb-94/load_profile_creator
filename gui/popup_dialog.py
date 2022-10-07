@@ -10,6 +10,9 @@ from PyQt5.QtWidgets import *
 
 
 class DeleteDialog(QMessageBox):
+    """
+    Warning PopUp DIalog
+    """
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setIcon(QMessageBox.Information)
@@ -27,6 +30,9 @@ class DeleteDialog(QMessageBox):
 
 
 class Load_Dialog(QWidget):
+    """
+    PopUp Dialog to create loads
+    """
     def __init__(self, parent=None):
         super().__init__(parent)
 

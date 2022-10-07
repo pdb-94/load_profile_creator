@@ -13,6 +13,9 @@ from PyQt5.QtCore import *
 
 
 class Consumer(QWidget):
+    """
+    Tab to create Load object
+    """
     def __init__(self):
         super().__init__()
 
