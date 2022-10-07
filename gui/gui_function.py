@@ -23,11 +23,13 @@ def convert_time(string: str):
     return hour, minute
 
 
-def show_widget(widget: list, show: bool=True):
+def show_widget(widget: list, show: bool = True):
     """
     Show buttons
     :param widget: list
         buttons to show
+    :param show: bool
+        boolean value to show widgets
     :return: None
     """
     if show is True:
@@ -38,11 +40,13 @@ def show_widget(widget: list, show: bool=True):
             widget[i].hide()
 
 
-def enable_widget(widget: list, enable: bool=True):
+def enable_widget(widget: list, enable: bool = True):
     """
-    Show buttons
+    Show widgets
     :param widget: list
         buttons to show
+    :param enable: bool
+        boolean value to enable widgets
     :return: None
     """
     for i in range(len(widget)):
@@ -65,7 +69,7 @@ def delete_from_viewer(widget, item: int):
 def add_to_viewer(widget, item: list):
     """
     Add Item to ListWidget
-    :param widget: PyQt5 ListWidget()
+    :param widget: PyQt5 ListWidget
         ListWidget from tab
     :param item: list
         strings to add to ListWidget
@@ -74,10 +78,11 @@ def add_to_viewer(widget, item: list):
     viewer = widget.viewer
     viewer.addItems(item)
 
+
 def add_to_room_viewer(widget, item: list):
     """
     Add Item to Room ListWidget
-    :param widget: PyQt5 ListWidget()
+    :param widget: PyQt5 ListWidget
         ListWidget from tab
     :param item: list
         strings to add to ListWidget
@@ -91,8 +96,8 @@ def add_to_room_viewer(widget, item: list):
 def add_combo(widget, name: list):
     """
     Add Item to department_ComboBox in Tab Room
-    :param widget: PyQt5 ComboBox()
-        QComboBox()
+    :param widget: PyQt5 ComboBox
+        QComboBox
     :param name: list
         items to add to ComboBox
     :return: None
@@ -115,13 +120,35 @@ def change_combo_index(combo: list):
 
 
 def delete_from_combo(combo, index):
+    """
+    :param combo: PyQt5 QComboBox
+        QComboBox
+    :param index: int
+        row to delete
+    :return: None
+    """
     combo.removeItem(index)
 
+
 def clear_widget(widget: list):
+    """
+    Clear widgets
+    :param widget: PyQt5 Widget
+        Widget to clear
+    :return: None
+    """
     for i in range(len(widget)):
-            widget[i].clear()
+        widget[i].clear()
+
 
 def change_widget_text(widget: list, text: list):
+    """
+    Change widget text
+    :param widget: PyQt5 Widget
+        Widget to change text
+    :param text: str
+        new text
+    :return: NOne
+    """
     for i in range(len(widget)):
         widget[i].setText(text[i])
-
