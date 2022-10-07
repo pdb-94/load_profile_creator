@@ -75,13 +75,13 @@ class Load_profile(QWidget):
         :param time_series:
         :param df: pd.DataFrame
             load_df
-        :return:
+        :return: None
         """
+        # Create Widgets
         self.plot = Plot(df=df,
                          time_series=time_series,
                          width=5, height=4, dpi=100)
-        self.layout.addWidget(self.plot, 6, 0, 1, 2)
-
         self.toolbar = NavigationToolbar(self.plot, self)
+        # Add Widgets to Layout
+        self.layout.addWidget(self.plot, 6, 0, 1, 2)
         self.layout.addWidget(self.toolbar, 5, 0, 1, 2)
-

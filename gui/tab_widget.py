@@ -9,7 +9,6 @@ __version__ = '0.1'
 __author__ = 'pdb-94'
 
 
-
 import sys
 import os
 import pandas as pd
@@ -103,7 +102,6 @@ class TabWidget(QWidget):
         self.tabs.widget(6).level_1_combo.currentIndexChanged.connect(self.change_load_profile)
         self.tabs.widget(6).level_2_combo.currentIndexChanged.connect(self.level_2_combo)
         self.tabs.widget(6).level_3_combo.currentIndexChanged.connect(self.level_3_combo)
-
 
     def next_tab(self):
         """
@@ -365,10 +363,10 @@ class TabWidget(QWidget):
         # Find standard csv-file
         root = sys.path[1]
         root = 'C:/Users/Rummeny/PycharmProjects/hospital_load_model'  # TODO: Remove Statement (just to be able to run debugger)
-        room_str = tab.standard_combo.currentText()
-        room_str = room_str.lower()
-        room_str = room_str.replace(' ', '_')
-        file = room_str + '.csv'
+        room_name = tab.standard_combo.currentText()
+        room_name = room_name.lower()
+        room_name = room_name.replace(' ', '_')
+        file = room_name + '.csv'
         path = root + '/data/room/' + file
         standard_room = pd.read_csv(path, sep=';', decimal=',')
         # Create room object in selected Department in Environment
@@ -464,10 +462,8 @@ class TabWidget(QWidget):
                 dep_index = tab(index).department_combo.currentIndex()
                 room_index = tab(index).viewer.currentRow()
                 gui_func.delete_from_combo(combo=tab(4).room_combo, index=item_index)
-                print('Vor Löschen: ' + str(self.env[0].department[dep_index].room_names))
                 self.env[0].department[dep_index].room.pop(room_index)
                 self.env[0].department[dep_index].room_names.pop(room_index)
-                print('Nach Löschen: ' + str(self.env[0].department[dep_index].room_names))
             elif index == 4:
                 # Tab Consumer
                 gui_func.delete_from_viewer(widget=tab(index), item=item_index)
@@ -496,7 +492,6 @@ class TabWidget(QWidget):
                     if len(self.env[0].department[dep_index].room) > 0:
                         # Add Rooms based on selection in department combo
                         room_names = self.env[0].department[dep_index].room_names
-                        print('Hinzufügen: ' + str(room_names))
                         gui_func.add_to_viewer(widget=tab(index), item=room_names)
                 elif index == 4:
                     # Tab Consumer

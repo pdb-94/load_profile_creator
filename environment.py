@@ -9,7 +9,7 @@ import os
 import pandas as pd
 import datetime as dt
 import matplotlib.pyplot as plt
-# HEyDU Libraries
+# LPC Libraries
 import models as md
 
 
@@ -104,4 +104,3 @@ if __name__ == '__main__':
                                                      dt.timedelta(minutes=1)])
     environment.create_department(name='Administration')
     environment.department[0].create_room('Emergency Consulting')
-

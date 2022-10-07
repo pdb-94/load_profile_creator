@@ -31,7 +31,7 @@ class Consumer(QWidget):
         self.overview = QLabel(overview)
         self.overview.setWordWrap(True)
 
-        # Lineedits
+        # LineEdits
         self.name_edit = QLineEdit()
 
         # ComboBox

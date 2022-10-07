@@ -27,7 +27,7 @@ class Room(QWidget):
         self.time = QLabel('Time Data')
         self.start_time = QLabel('Opening time')
         self.end_time = QLabel('Closing time')
-        overview = ('Overview \n(Shows all rooms in\ncurrently selected\ndepartment.)')
+        overview = "Overview \n(Shows all rooms in\ncurrently selected\ndepartment.)"
         self.overview = QLabel(overview)
         self.overview.setWordWrap(True)
         self.standard = QLabel('Standard rooms')
