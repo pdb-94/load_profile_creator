@@ -1,10 +1,15 @@
+"""
+Module to display plot in GUI
+
+@author: Paul Bohn
+@contributor: Paul Bohn
+"""
+
 import sys
 import matplotlib
 import matplotlib.pyplot as plt
 matplotlib.use('Qt5Agg')
-
 from PyQt5 import QtCore, QtWidgets
-
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
 

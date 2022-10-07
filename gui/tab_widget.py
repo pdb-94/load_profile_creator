@@ -1,3 +1,15 @@
+"""
+Main  GUI module of Load Profile Creator (LPC)
+
+@author: Paul Bohn
+@contributor: Paul Bohn
+"""
+
+__version__ = '0.1'
+__author__ = 'pdb-94'
+
+
+
 import sys
 import os
 import pandas as pd
@@ -10,7 +22,7 @@ from gui.project_setup import Project_Setup
 from gui.hospital import Hospital
 from gui.department import Department
 from gui.room import Room
-from gui.consumer import Consumer
+from gui.load import Consumer
 from gui.overview import Overview
 from gui.load_profile import Load_profile
 from gui.plot import Plot

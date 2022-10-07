@@ -1,3 +1,10 @@
+"""
+Module including class Environment
+
+@author: Paul Bohn
+@contributor: Paul Bohn
+"""
+
 import os
 import pandas as pd
 import datetime as dt

@@ -1,3 +1,10 @@
+"""
+Module with GUI PopUps
+
+@author: Paul Bohn
+@contributor: Paul Bohn
+"""
+
 import sys
 from PyQt5.QtWidgets import *
 

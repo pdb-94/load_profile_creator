@@ -1,3 +1,14 @@
+"""
+GUI widget to display load profiles
+
+@author: Paul Bohn
+@contributor: Paul Bohn
+"""
+
+__version__ = '0.1'
+__author__ = 'pdb-94'
+
+
 import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *

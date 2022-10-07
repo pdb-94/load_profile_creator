@@ -1,7 +1,15 @@
+"""
+Module including Classes Department, Room and Load
+
+@author: Paul Bohn
+@contributor: Paul Bohn
+"""
+
 import os
 import numpy as np
 import pandas as pd
 import datetime as dt
+
 
 class Department:
     """

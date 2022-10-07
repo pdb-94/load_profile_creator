@@ -1,6 +1,12 @@
 """
-Module to run basic gui functions
+Module including GUI functions
+
+@author: Paul Bohn
+@contributor: Paul Bohn
 """
+
+__version__ = '0.1'
+__author__ = 'pdb-94'
 
 
 def convert_time(string: str):
