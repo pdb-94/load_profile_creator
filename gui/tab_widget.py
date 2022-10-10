@@ -81,6 +81,9 @@ class TabWidget(QWidget):
         self.layout.addWidget(self.next_btn, 3, 1)
         self.setLayout(self.layout)
 
+        # Warning Dialog
+        self.warning_dialog = DeleteDialog()
+
         # Set up Main Window
         self.setGeometry(200, 200, 1200, 750)
         self.setWindowTitle('Load Profile Creator')
@@ -366,6 +369,7 @@ class TabWidget(QWidget):
         load = list(standard_room['device'])
         load_quantity = list(standard_room['quantity'])
         # Create load objects from standard room
+        # TODO: create data from load parameters
         for i in range(len(load)):
             for k in range(load_quantity[i]):
                 if load_quantity[i] == 1:
@@ -429,8 +433,7 @@ class TabWidget(QWidget):
         if tab(index).viewer.count() > 0:
             if index == 1:
                 # Tab Hospital: Delete Item based on selected item in hospital_viewer
-                # Open Warning Dialog before deleting hospital
-                self.warning_dialog = DeleteDialog()
+                # Open warning Dialog
                 option = self.warning_dialog.execute()
                 if option is True:
                     # Delete Item
@@ -511,7 +514,7 @@ class TabWidget(QWidget):
     def change_load_profile(self):
         """
         Change load profile level in tab load_profile
-        :return:
+        :return: None
         """
         tab = self.tabs.widget(6)
         # Clear and load profile ComboBox

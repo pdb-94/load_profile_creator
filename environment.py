@@ -102,5 +102,4 @@ if __name__ == '__main__':
     environment = Environment('Hospital', time_data=[dt.datetime(year=2022, month=9, day=29, hour=0, minute=0),
                                                      dt.datetime(year=2022, month=9, day=29, hour=23, minute=59),
                                                      dt.timedelta(minutes=1)])
-    environment.create_department(name='Administration')
-    environment.department[0].create_room('Emergency Consulting')
+

@@ -87,7 +87,7 @@ class Room:
 
 class Load:
 
-    # TODO: power/standby/cycle_len aas float/int; cycle_profile/profile pd.read_csv
+    # TODO: Fix standard room compatibility
 
     def __init__(self,
                  env=None,
