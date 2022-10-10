@@ -11,6 +11,7 @@ from PyQt5.QtGui import *
 from PyQt5.Qt import *
 from PyQt5.QtCore import *
 
+# TODO: Set Tooltip on information box 11117
 
 class Hospital(QWidget):
     """
@@ -21,6 +22,9 @@ class Hospital(QWidget):
 
         self.name = QLabel('Project Name')
         self.time = QLabel('Time Data')
+        self.information = QLabel()
+        information_pixmap = QPixmap('gui/images/information.png')
+        self.information.setPixmap(information_pixmap.scaled(20, 20))
         self.start_time = QLabel('Start time')
         self.end_time = QLabel('End time')
         self.time_step = QLabel('Resolution')
@@ -44,6 +48,7 @@ class Hospital(QWidget):
         self.layout.addWidget(self.name, 0, 0)
         self.layout.addWidget(self.name_edit, 0, 1)
         self.layout.addWidget(self.time, 1, 0)
+        self.layout.addWidget(self.information, 1, 1)
         self.layout.addWidget(self.start_time, 2, 0)
         self.layout.addWidget(self.start_time_edit, 2, 1)
         self.layout.addWidget(self.end_time, 3, 0)

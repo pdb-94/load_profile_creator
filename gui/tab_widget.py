@@ -49,22 +49,19 @@ class TabWidget(QWidget):
                           'Department',
                           'Room',
                           'Consumer',
-                          'Overview',
                           'Load profile']
         self.tab_classes = [Project_Setup,
                             Hospital,
                             Department,
                             Room,
                             Consumer,
-                            Overview,
                             Load_profile]
         for i in range(len(self.tab_classes)):
             self.tabs.addTab(self.tab_classes[i](), self.tab_title[i])
         gui_func.enable_widget(widget=[self.tabs.widget(2),
                                        self.tabs.widget(3),
                                        self.tabs.widget(4),
-                                       self.tabs.widget(5),
-                                       self.tabs.widget(6)],
+                                       self.tabs.widget(5)],
                                enable=False)
 
         # Set up Pushbutton
@@ -99,9 +96,9 @@ class TabWidget(QWidget):
         self.tabs.widget(3).department_combo.currentIndexChanged.connect(self.add_room_combo)
         self.tabs.widget(4).department_combo.currentIndexChanged.connect(self.add_room_combo)
         self.tabs.widget(4).room_combo.currentIndexChanged.connect(self.add_consumer_combo)
-        self.tabs.widget(6).level_1_combo.currentIndexChanged.connect(self.change_load_profile)
-        self.tabs.widget(6).level_2_combo.currentIndexChanged.connect(self.level_2_combo)
-        self.tabs.widget(6).level_3_combo.currentIndexChanged.connect(self.level_3_combo)
+        self.tabs.widget(5).level_1_combo.currentIndexChanged.connect(self.change_load_profile)
+        self.tabs.widget(5).level_2_combo.currentIndexChanged.connect(self.level_2_combo)
+        self.tabs.widget(5).level_3_combo.currentIndexChanged.connect(self.level_3_combo)
 
     def next_tab(self):
         """
@@ -188,12 +185,6 @@ class TabWidget(QWidget):
                         # Add selected items to ComboBox
                         gui_func.add_combo(widget=tab.room_combo, name=self.env[0].department[0].room_names)
         elif index == 5:
-            # Tab Overview
-            # Change widget text, show and enable/disable widgets
-            gui_func.change_widget_text(widget=[self.next_btn], text=['Run Simulation'])
-            gui_func.show_widget(widget=[self.delete_btn, self.save_btn, self.return_btn], show=True)
-            gui_func.enable_widget(widget=[self.save_btn, self.return_btn], enable=True)
-        elif index == 6:
             # Tab Load profile
             tab = self.tabs.widget(index)
             # Change widget text, show and enable/disable widgets
@@ -237,13 +228,6 @@ class TabWidget(QWidget):
             else:
                 self.create_load()
         elif index == 5:
-            # Tab Overview
-            if isinstance(self.env[0], Environment):
-                # Create operator from user Input
-                print('Running')
-            else:
-                print('Finish System Design before starting simulation.')
-        elif index == 6:
             # Tab Load profile
             print('Exporting Data')
 
@@ -566,7 +550,7 @@ class TabWidget(QWidget):
 
         :return:
         """
-        tab = self.tabs.widget(6)
+        tab = self.tabs.widget(5)
         dep_index = tab.level_2_combo.currentIndex()
         dep = self.env[0].department[dep_index]
         name = dep.name
@@ -583,7 +567,7 @@ class TabWidget(QWidget):
 
         :return:
         """
-        tab = self.tabs.widget(6)
+        tab = self.tabs.widget(5)
         dep_index = tab.level_2_combo.currentIndex()
         room_index = tab.level_3_combo.currentIndex()
         room = self.env[0].department[dep_index].room[room_index]

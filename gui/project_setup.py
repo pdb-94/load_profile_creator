@@ -30,13 +30,12 @@ class Project_Setup(QWidget):
         self.description = QLabel(description)
         self.description.setWordWrap(True)
         self.th = QLabel()
-        # th_pixmap = QPixmap('th-koeln.png')
-        # th_pixmap.scaledToHeight(64)
-        # self.th.setPixmap(th_pixmap)
+        th_pixmap = QPixmap('gui/images/th-koeln.png')
+        self.th.setPixmap(th_pixmap.scaled(102, 55))
 
         # Set up Layout
         self.layout = QGridLayout()
         self.layout.addWidget(self.title, 0, 0, 1, 2)
         self.layout.addWidget(self.description, 1, 0)
-        self.layout.addWidget(self.th, 1, 1)
+        self.layout.addWidget(self.th, 2, 0)
         self.setLayout(self.layout)
