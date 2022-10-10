@@ -259,7 +259,7 @@ class TabWidget(QWidget):
             # Clear Input
             gui_func.clear_widget(widget=[tab(1).name_edit])
             gui_func.enable_widget(widget=[self.next_btn], enable=True)
-            gui_func.enable_widget(widget=[self.tabs.widget(2), self.tabs.widget(5), self.tabs.widget(6)], enable=True)
+            gui_func.enable_widget(widget=[self.tabs.widget(2), self.tabs.widget(5)], enable=True)
 
     def create_department(self):
         """
@@ -383,29 +383,38 @@ class TabWidget(QWidget):
         :return: None
         """
         tab = self.tabs.widget(4)
-        # name
-        name = tab.name_edit.text()
-        load_type = str(tab.type_combo.currentText())
-        # Create Load object in selected Department & Room in Environment
         dep_index = tab.department_combo.currentIndex()
         room_index = tab.room_combo.currentIndex()
+        # Basic parameters (name, power, standby)
+        name = tab.name_edit.text()
+        load_type = str(tab.type_combo.currentText())
+        load_type = load_type.lower()
+        power = tab.power_edit.text()
+        standby = tab.standby_edit.text()
+        # Build dictionary with load parameters and clear widget
+        if load_type == 'constant':
+            # Constant load
+            on = self.env[0].department[dep_index].room[room_index].t_start
+            off = self.env[0].department[dep_index].room[room_index].t_end
+            data = {'load_type': load_type, 'power [W]': power, 'standby [W]': standby, 'on': on, 'off': off}
+            gui_func.clear_widget(widget=[tab.name_edit, tab.power_edit, tab.standby_edit])
+        else:
+            # Sequential load
+            cycle_length = tab.cycle_edit.text()
+            cycle = tab.cycle_profile_edit.text()
+            profile = tab.profile_edit.text()
+            data = {'load_type': load_type, 'power [W]': power, 'standby [W]': standby, 'cycle_length': cycle_length,
+                    'cycle': cycle, 'profile': profile}
+            gui_func.clear_widget(widget=[tab.name_edit, tab.power_edit, tab.standby_edit,
+                                          tab.cycle_edit, tab.cycle_profile_edit, tab.profile_edit])
+
+        # Create Load object in selected Department & Room in Environment
+        print(data)
         self.env[0].department[dep_index].room[room_index].create_load(name=name,
-                                                                       data=None)
-        # Open Dialog to create load
-        # self.load_dialog = Load_Dialog()
-        # # Run function based on load type
-        # if load_type == 'Constant':
-        #     self.load_dialog.constant()
-        # elif load_type == 'Sequential':
-        #     self.load_dialog.sequential()
-        # elif load_type == 'Data base':
-        #     self.load_dialog.database()
-        # elif load_type == 'User':
-        #     self.load_dialog.user()
+                                                                       data=data)
         # Add name to viewer
         gui_func.add_to_viewer(widget=tab, item=[name])
         # Clear User Inputs
-        gui_func.clear_widget(widget=[tab.name_edit])
         gui_func.change_combo_index(combo=[tab.type_combo])
 
     def delete(self):

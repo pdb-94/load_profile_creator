@@ -86,6 +86,9 @@ class Room:
 
 
 class Load:
+
+    # TODO: power/standby/cycle_len aas float/int; cycle_profile/profile pd.read_csv
+
     def __init__(self,
                  env=None,
                  name: str = None,
@@ -93,7 +96,26 @@ class Load:
         self.env = env
         self.name = name
         self.data = data
-        # self.l_type = self.data.get('load_type')
+        # Collect parameters from data
+        self.load_type = self.data['load_type']
+        self.power = float(self.data['power [W]'])
+        self.standby = float(self.data['standby [W]'])
+        if self.load_type == 'constant':
+            self.on = self.data['on']
+            self.off = self.data['off']
+        else:
+            if self.data['cycle_length'] == '':
+                pass
+            else:
+                self.cycle_length = int(self.data['cycle_length'])
+            if self.data['cycle'] == '':
+                pass
+            else:
+                self.cycle = pd.read_csv(self.data['cycle'])
+            if self.data['profile'] == '':
+                pass
+            else:
+                self.profile = pd.read_csv(self.data['profile'])
 
         # Create time_series and load_df
         self.time_series = self.env.time_series
@@ -101,5 +123,9 @@ class Load:
         self.load_profile = pd.DataFrame(index=self.time_series, columns=columns)
 
     def create_profile(self):
+        """
+
+        :return:
+        """
         if self.profile is not None:
             self.load_profile['power [W]'] = self.profile['Status'] * self.power
