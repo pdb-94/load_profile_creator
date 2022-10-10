@@ -22,7 +22,6 @@ from gui.hospital import Hospital
 from gui.department import Department
 from gui.room import Room
 from gui.load import Consumer
-from gui.overview import Overview
 from gui.load_profile import Load_profile
 from gui.plot import Plot
 from gui.popup_dialog import DeleteDialog, Load_Dialog
