@@ -26,15 +26,16 @@ class Environment:
         self.department = []
         self.department_names = []
         self.load = []
-        self.data_base = []
         self.standard_room = []
         # Create time series and load DataFrame
         self.time_series = self.create_df()
         columns = ['Total Load [W]']
         self.load_df = pd.DataFrame(index=self.time_series, columns=columns)
-        self.load_df['Total Load [W]'] = 100
+        self.load_df['Total Load [W]'] = 100  # TODO: delete Statement
+        # DataBase
+        # self.database = self.import_database()
+        # print(self.database)
 
-        self.import_database()
         self.import_standard_room()
 
     def create_df(self):
@@ -59,12 +60,12 @@ class Environment:
 
         return df
 
-    def create_department(self, name, t_start, t_end):
+    def create_department(self, name: str, t_start: dt.time, t_end: dt.time):
         """
         Create department in self.department
-        :param t_end:
-        :param t_start:
-        :param name:
+        :param name: str
+        :param t_end: dt.time
+        :param t_start: dt.time
         :return:
         """
         self.department.append(md.Department(env=self, name=name, t_start=t_start, t_end=t_end))
@@ -73,15 +74,14 @@ class Environment:
     def import_database(self):
         """
         Import load data base
-        :return:
+        :return: df
+
         """
         path = os.getcwd()
-        dir = 'data/load'
-        files = next(os.walk(path+dir), (None, None, []))[2]
-        csv_files = [file for file in files if file.endswith('.csv')]
-        header = [0, 1, 2, 3, 4, 5, 6]
-        for file in csv_files:
-            self.data_base.append(pd.read_csv(path + dir + '/' + file, sep=';', decimal=',', header=header))
+        dir = 'data'
+        df = pd.read_csv(path + '/data/database.csv', sep=';', decimal=',')
+
+        return df
 
     def import_standard_room(self):
         """
@@ -103,3 +103,6 @@ if __name__ == '__main__':
                                                      dt.datetime(year=2022, month=9, day=29, hour=23, minute=59),
                                                      dt.timedelta(minutes=1)])
 
+    # files = next(os.walk(path+dir), (None, None, []))[2]
+    # csv_files = [file for file in files if file.endswith('.csv')]
+    # header = [0, 1, 2, 3, 4, 5, 6]

@@ -9,14 +9,14 @@ __version__ = '0.1'
 __author__ = 'pdb-94'
 
 
-def convert_time(string: str):
+def convert_time(text: str):
     """
     Convert text into int
-    :param string: str
+    :param text: str
         time string
     :return: hour, minute: int
     """
-    time_list = string.split(':')
+    time_list = text.split(':')
     hour = int(time_list[0])
     minute = int(time_list[1])
 
@@ -119,7 +119,7 @@ def change_combo_index(combo: list):
             combobox.setCurrentIndex(0)
 
 
-def delete_from_combo(combo, index):
+def delete_from_combo(combo, index: int):
     """
     :param combo: PyQt5 QComboBox
         QComboBox

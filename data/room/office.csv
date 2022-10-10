@@ -1,8 +1,8 @@
-﻿quantity;device;power [W];total power [W];scalable
-1;Air Condition;1800;1800;True
-2;Computer;2200;2200;True
-2;Monitor;20;80;True
-2;Printer;300;300;True
-2;Light;20;40;True
-1;Lamp;20;40;True
-1;Ceiling Fan;60;60;True
+﻿quantity;device;manufacturer;model;group;priority;type;power [W];standby [W];cycle length
+1;Air Condition (1.8 kW);Bruhm;;Technical;B;sequential;1800;0;5
+2;Computer;;;Office;C;constant;135;0;
+2;Monitor;;;Office;C;constant;50;0;
+2;Printer;;;Office;C;cycle;300;0;1
+2;Light;;;Lighting;C;constant;20;0;
+1;Lamp;;;Lighting;C;constant;20;0;
+1;Ceiling Fan;;;Technical;C;constant;60;0;

@@ -10,6 +10,7 @@ __author__ = 'pdb-94'
 
 
 import sys
+import pandas as pd
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5 import Qt
@@ -69,11 +70,12 @@ class Load_profile(QWidget):
         self.layout.addWidget(self.plot, 6, 0, 1, 2)
         self.setLayout(self.layout)
 
-    def adjust_plot(self,  df, time_series):
+    def adjust_plot(self,  df: pd.Series, time_series: pd.Series):
         """
         Plot DataFrame based on parameter load_profile
-        :param time_series:
-        :param df: pd.DataFrame
+        :param time_series: pd.Series
+            environemnt time_series
+        :param df: pd.Series
             load_df
         :return: None
         """

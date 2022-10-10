@@ -24,12 +24,13 @@ from gui.room import Room
 from gui.load import Consumer
 from gui.load_profile import Load_profile
 from gui.plot import Plot
-from gui.popup_dialog import DeleteDialog, Load_Dialog
+from gui.popup_dialog import DeleteDialog
 import gui.gui_function as gui_func
 # Import HEyDU Modules
 from environment import Environment
 import models as md
 
+# TODO: Create function export_data
 
 class TabWidget(QWidget):
     """
@@ -109,12 +110,14 @@ class TabWidget(QWidget):
         """
         # Get current Index from TabWidget and set current Index -=1
         index = self.tabs.currentIndex()
-        if index < len(self.tab_classes):
+        if index == len(self.tab_classes)-1:
+            self.export_data()
+        elif index < len(self.tab_classes):
             self.tabs.setCurrentIndex(index + 1)
 
     def previous_tab(self):
         """
-        Show previous Tt
+        Show previous tab
         :return: None
         """
         # Get current Index from TabWidget and set current Index -=1
@@ -191,7 +194,7 @@ class TabWidget(QWidget):
             tab = self.tabs.widget(index)
             # Change widget text, show and enable/disable widgets
             gui_func.change_widget_text(widget=[self.next_btn], text=['Export Data'])
-            gui_func.show_widget(widget=[self.delete_btn], show=False)
+            gui_func.show_widget(widget=[self.delete_btn, self.save_btn], show=False)
             gui_func.enable_widget(widget=[self.save_btn, self.return_btn], enable=True)
             if isinstance(self.env[0], Environment):
                 gui_func.enable_widget(widget=[tab.level_1_combo], enable=True)
@@ -229,9 +232,6 @@ class TabWidget(QWidget):
                 print('Create rooms before creating consumers')
             else:
                 self.create_load()
-        elif index == 5:
-            # Tab Load profile
-            print('Exporting Data')
 
     def create_env(self):
         """
@@ -274,9 +274,9 @@ class TabWidget(QWidget):
         name = tab(2).name_edit.text()
         # Time Data
         start_str = tab(2).start_time_edit.text()
-        start = gui_func.convert_time(string=start_str)
+        start = gui_func.convert_time(text=start_str)
         end_str = tab(2).end_time_edit.text()
-        end = gui_func.convert_time(string=end_str)
+        end = gui_func.convert_time(text=end_str)
         # Create department object in Environment
         self.env[0].create_department(name=name,
                                       t_start=dt.time(hour=start[0], minute=start[1]),
@@ -317,9 +317,9 @@ class TabWidget(QWidget):
         name = tab.name_edit.text()
         # Time data
         start_str = tab.start_time_edit.text()
-        start = gui_func.convert_time(string=start_str)
+        start = gui_func.convert_time(text=start_str)
         end_str = tab.end_time_edit.text()
-        end = gui_func.convert_time(string=end_str)
+        end = gui_func.convert_time(text=end_str)
         t_start = dt.time(hour=start[0], minute=start[1])
         t_end = dt.time(hour=end[0], minute=end[1])
         # Create room object in selected Department in Environment
@@ -333,6 +333,7 @@ class TabWidget(QWidget):
         gui_func.enable_widget(widget=[self.tabs.widget(4)], enable=True)
 
     def create_standard_room(self, dep_index):
+        # TODO: Complete Rooms
         """
         Get standard room parameters and create room object in selected Department
         :param dep_index: int
@@ -369,16 +370,31 @@ class TabWidget(QWidget):
         load = list(standard_room['device'])
         load_quantity = list(standard_room['quantity'])
         # Create load objects from standard room
-        # TODO: create data from load parameters
+        # TODO: cycle and profile
         for i in range(len(load)):
+            load_type = standard_room.loc[i, 'type']
+            power = standard_room.loc[i, 'power [W]']
+            standby = standard_room.loc[i, 'standby [W]']
+            cycle_length = standard_room.loc[i, 'cycle length']
+            on = self.env[0].department[dep_index].t_start
+            off = self.env[0].department[dep_index].t_end
+            if load_type == 'constant':
+                cycle = ''
+                profile = ''
+            else:
+                cycle = ''
+                profile = ''
             for k in range(load_quantity[i]):
                 if load_quantity[i] == 1:
                     load_name = load[i]
                 else:
                     load_name = load[i] + ' ' + str(k + 1)
+                data = {'load_type': load_type, 'power [W]': power, 'standby [W]': standby, 'on': on, 'off': off,
+                        'cycle_length': cycle_length,
+                        'cycle': cycle, 'profile': profile}
                 self.env[0].department[dep_index].room[-1].load.append(md.Load(env=self.env[0],
                                                                                name=load_name,
-                                                                               data=None))
+                                                                               data=data))
                 self.env[0].department[dep_index].room[-1].load_names.append(load_name)
 
     def create_load(self):
@@ -420,6 +436,14 @@ class TabWidget(QWidget):
         gui_func.add_to_viewer(widget=tab, item=[name])
         # Clear User Inputs
         gui_func.change_combo_index(combo=[tab.type_combo])
+
+    def export_data(self):
+        """
+        Create directory
+        Export load_profiles
+        :return:
+        """
+        print('Export Data')
 
     def delete(self):
         """
@@ -516,7 +540,7 @@ class TabWidget(QWidget):
         Change load profile level in tab load_profile
         :return: None
         """
-        tab = self.tabs.widget(6)
+        tab = self.tabs.widget(5)
         # Clear and load profile ComboBox
         gui_func.clear_widget(widget=[tab.level_2_combo, tab.level_3_combo, tab.level_4_combo])
         level = tab.level_1_combo.currentIndex()
