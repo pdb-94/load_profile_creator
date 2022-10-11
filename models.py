@@ -33,7 +33,7 @@ class Department:
         # Create time_series and load_df
         self.time_series = self.env.time_series
         columns = [name + ' Total Load [W]']
-        self.load_df = pd.DataFrame(index=self.time_series, columns=columns)
+        self.load_profile = pd.DataFrame(index=self.time_series, columns=columns)
 
     def create_room(self, name: str, t_start: dt.time, t_end: dt.time):
         """
@@ -70,7 +70,7 @@ class Room:
 
         self.time_series = self.env.time_series
         columns = [name + ' Total Load [W]']
-        self.load_df = pd.DataFrame(index=self.time_series, columns=columns)
+        self.load_profile = pd.DataFrame(index=self.time_series, columns=columns)
 
     def create_load(self, name: str, data: dict):
         """
@@ -85,7 +85,7 @@ class Room:
                               name=name,
                               data=data))
         self.load_names.append(name)
-        self.load_df[name + ' power [W]'] = self.load[-1].load_profile[name + ' power [W]']
+        self.load_profile[name + ' power [W]'] = self.load[-1].load_profile[name + ' power [W]']
 
 
 class Load:

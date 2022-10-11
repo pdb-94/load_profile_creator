@@ -30,8 +30,8 @@ class Environment:
         # Create time series and load DataFrame
         self.time_series = self.create_df()
         columns = ['Total Load [W]']
-        self.load_df = pd.DataFrame(index=self.time_series, columns=columns)
-        self.load_df['Total Load [W]'] = 100  # TODO: delete Statement
+        self.load_profile = pd.DataFrame(index=self.time_series, columns=columns)
+        self.load_profile['Total Load [W]'] = 100  # TODO: delete Statement
         # DataBase
         # self.database = self.import_database()
         # print(self.database)
