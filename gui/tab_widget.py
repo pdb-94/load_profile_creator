@@ -100,8 +100,9 @@ class TabWidget(QWidget):
         self.tabs.widget(4).department_combo.currentIndexChanged.connect(self.add_room_combo)
         self.tabs.widget(4).room_combo.currentIndexChanged.connect(self.add_consumer_combo)
         self.tabs.widget(5).level_1_combo.currentIndexChanged.connect(self.change_load_profile)
-        self.tabs.widget(5).level_2_combo.currentIndexChanged.connect(self.level_2_combo)
-        self.tabs.widget(5).level_3_combo.currentIndexChanged.connect(self.level_3_combo)
+        self.tabs.widget(5).level_2_combo.currentIndexChanged.connect(self.department_load_profile)
+        self.tabs.widget(5).level_3_combo.currentIndexChanged.connect(self.room_load_profile)
+        self.tabs.widget(5).level_4_combo.currentIndexChanged.connect(self.consumer_load_profile)
 
     def next_tab(self):
         """
@@ -553,6 +554,7 @@ class TabWidget(QWidget):
             gui_func.enable_widget(widget=[tab.level_1_combo], enable=True)
             if level == 0:
                 # Hospital
+                # Show hospital load profile
                 tab.adjust_plot(time_series=self.env[0].time_series,
                                 df=self.env[0].load_df['Total Load [W]'])
             elif level == 1:
@@ -580,9 +582,9 @@ class TabWidget(QWidget):
                                              tab.level_4_combo, tab.level_4],
                                      show=True)
 
-    def level_2_combo(self):
+    def department_load_profile(self):
         """
-
+        Show department load profile in tab load profile
         :return:
         """
         tab = self.tabs.widget(5)
@@ -597,9 +599,9 @@ class TabWidget(QWidget):
             tab.room = dep.room_names
             gui_func.add_combo(widget=tab.level_3_combo, name=tab.room)
 
-    def level_3_combo(self):
+    def room_load_profile(self):
         """
-
+        Show room load profile in tab load profile
         :return:
         """
         tab = self.tabs.widget(5)
@@ -614,6 +616,21 @@ class TabWidget(QWidget):
             gui_func.clear_widget(widget=[tab.level_4_combo])
             tab.consumer = room.load_names
             gui_func.add_combo(widget=tab.level_4_combo, name=tab.consumer)
+
+    def consumer_load_profile(self):
+        """
+        Show consumer load profile in tab load profile
+        :return:
+        """
+        tab = self.tabs.widget(5)
+        dep_index = tab.level_2_combo.currentIndex()
+        room_index = tab.level_3_combo.currentIndex()
+        load_index = tab.level_4_combo.currentIndex()
+        room = self.env[0].department[dep_index].room[room_index]
+        load = self.env[0].department[dep_index].room[room_index].load[load_index]
+        name = load.name
+        tab.adjust_plot(time_series=self.env[0].time_series,
+                        df=load.load_profile[name + ' power [W]'])
 
 
 if __name__ == '__main__':
