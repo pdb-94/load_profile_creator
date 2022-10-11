@@ -87,7 +87,8 @@ class Room:
 
 class Load:
 
-    # TODO: Fix standard room compatibility
+    # TODO: Create load profiles from data
+    #   - how to deal with profile (pd.Series with True/False)
 
     def __init__(self,
                  env=None,
@@ -101,8 +102,13 @@ class Load:
         self.power = float(self.data['power [W]'])
         self.standby = float(self.data['standby [W]'])
         if self.load_type == 'constant':
-            self.on = self.data['on']
-            self.off = self.data['off']
+            # Combine start time and date
+            on = self.data['on']
+            off = self.data['off']
+            start_date = self.env.time_series.iloc[0].date()
+            end_date = self.env.time_series.iloc[-1].date()
+            self.t_start = dt.datetime.combine(start_date, on)
+            self.t_end = dt.datetime.combine(end_date, off)
         else:
             if self.data['cycle_length'] == '':
                 pass
@@ -119,13 +125,39 @@ class Load:
 
         # Create time_series and load_df
         self.time_series = self.env.time_series
-        columns = ['power [W]']
+        columns = [name + ' power [W]']
         self.load_profile = pd.DataFrame(index=self.time_series, columns=columns)
+        self.create_profile()
 
     def create_profile(self):
         """
-
+        Call functions based on load_type
         :return:
         """
-        if self.profile is not None:
-            self.load_profile['power [W]'] = self.profile['Status'] * self.power
+        if self.load_type == 'constant':
+            self.constant_load_profile()
+        elif self.load_type == 'sequential':
+            self.sequential_load_profile()
+        elif self.load_type == 'cycle':
+            self.cycle_load_profile()
+        print(self.load_profile)
+
+    def constant_load_profile(self):
+        """
+        Create load profile for constant loads
+        :return:
+        """
+        env_start = self.env.time_series.iloc[0]
+        env_end = self.env.time_series.iloc[-1]
+        self.load_profile.loc[env_start:self.t_start, self.name + ' power [W]'] = self.standby
+        self.load_profile.loc[self.t_start:self.t_end, self.name + ' power [W]'] = self.power
+        self.load_profile.loc[self.t_end:env_end, self.name + ' power [W]'] = self.standby
+
+    def sequential_load_profile(self):
+        pass
+
+    def cycle_load_profile(self):
+        pass
+
+
+
