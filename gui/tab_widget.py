@@ -9,6 +9,7 @@ __version__ = '0.1'
 __author__ = 'pdb-94'
 
 import sys
+import os
 import numpy as np
 import pandas as pd
 from PyQt5.QtWidgets import *
@@ -28,7 +29,7 @@ from environment import Environment
 import models as md
 
 
-# TODO: Create function export_data
+# TODO: Create function create_directory
 
 
 class TabWidget(QWidget):
@@ -112,7 +113,7 @@ class TabWidget(QWidget):
         # Get current Index from TabWidget and set current Index -=1
         index = self.tabs.currentIndex()
         if index == len(self.tab_classes) - 1:
-            self.export_data()
+            self.create_directory()
         elif index < len(self.tab_classes):
             self.tabs.setCurrentIndex(index + 1)
 
@@ -349,7 +350,7 @@ class TabWidget(QWidget):
         t_start = dep.t_start
         t_end = dep.t_end
         # Find standard csv-file
-        root = sys.path[1]
+        # root = sys.path[1]
         root = 'C:/Users/Rummeny/PycharmProjects/hospital_load_model'  # TODO: Remove Statement (just to be able to run debugger)
         room_name = tab.standard_combo.currentText()
         room_name = room_name.lower()
@@ -396,7 +397,7 @@ class TabWidget(QWidget):
                 room = self.env[0].department[dep_index].room[-1]
                 room.load.append(md.Load(env=self.env[0], name=load_name, data=data))
                 room.load_names.append(load_name)
-                room.load_df[load_name + ' power [W]'] = room.load[-1].load_profile[load_name + ' power [W]']
+                room.load_profile[load_name + ' power [W]'] = room.load[-1].load_profile[load_name + ' power [W]']
 
     def create_load(self):
         """
@@ -437,13 +438,43 @@ class TabWidget(QWidget):
         # Clear User Inputs
         gui_func.change_combo_index(combo=[tab.type_combo])
 
-    def export_data(self):
+    def create_directory(self):
         """
-        Create directory
-        Export load_profiles
+        Create export directory
         :return:
         """
-        print('Export Data')
+        # root = sys.path[1]
+        root = 'C:/Users/Rummeny/PycharmProjects/hospital_load_model'
+        # Top Level
+        directory = '/load_profiles'
+        folder = root + directory
+        if not os.path.exists(folder):
+            os.makedirs(folder)
+        # Sub level
+        sub_directory = ['/hospital', '/department', '/room', '/consumer']
+        for sub_dir in sub_directory:
+            if not os.path.exists(folder+sub_dir):
+                os.makedirs(folder+sub_dir)
+        self.export_data(df=self.env[0],
+                         path=root+directory+sub_directory[0])
+        for i in range(len(self.env[0].department)):
+            self.export_data(df=self.env[0].department[i],
+                             path=root + directory + sub_directory[1])
+            for k in range(len(self.env[0].department[i].room)):
+                self.export_data(df=self.env[0].department[i].room[k],
+                                 path=root + directory + sub_directory[2])
+                for j in range(len(self.env[0].department[i].room[k].load)):
+                    self.export_data(df=self.env[0].department[i].room[k].load[j],
+                                     path=root + directory + sub_directory[3])
+
+    def export_data(self, df=None, path: str = None):
+        """
+        Export data
+        :param path:
+        :param df:
+        :return:
+        """
+        df.load_profile.to_csv(path + '/' + df.name + '.csv', sep=';', decimal=',')
 
     def delete(self):
         """
@@ -496,7 +527,7 @@ class TabWidget(QWidget):
                 name = self.env[0].department[dep_index].room[room_index].load_names[load_index]
                 room.load.pop(load_index)
                 room.load_names.pop(load_index)
-                room.load_df = room.load_df.drop([name + ' power [W]'], axis=1)
+                room.load_profile = room.load_profile.drop([name + ' power [W]'], axis=1)
 
     def add_room_combo(self):
         """
@@ -561,7 +592,7 @@ class TabWidget(QWidget):
                 # Hospital
                 # Show hospital load profile
                 tab.adjust_plot(time_series=self.env[0].time_series,
-                                df=self.env[0].load_df['Total Load [W]'])
+                                df=self.env[0].load_profile['Total Load [W]'])
             elif level == 1:
                 # Show, enable and add department names to level_2_combo
                 gui_func.clear_widget(widget=[tab.level_2_combo])
@@ -598,7 +629,7 @@ class TabWidget(QWidget):
         name = dep.name
         if tab.level_1_combo.currentIndex() == 1:
             tab.adjust_plot(time_series=self.env[0].time_series,
-                            df=dep.load_df[name + ' Total Load [W]'])
+                            df=dep.load_profile[name + ' Total Load [W]'])
         else:
             gui_func.clear_widget(widget=[tab.level_3_combo])
             tab.room = dep.room_names
@@ -615,11 +646,11 @@ class TabWidget(QWidget):
         room = self.env[0].department[dep_index].room[room_index]
         name = room.name
         if tab.level_1_combo.currentIndex() == 2:
-            room.load_df[name + ' Total Load [W]'] = np.nan
-            room.load_df[name + ' Total Load [W]'] = room.load_df.sum(axis=1)
+            room.load_profile[name + ' Total Load [W]'] = np.nan
+            room.load_profile[name + ' Total Load [W]'] = room.load_profile.sum(axis=1)
             tab.adjust_plot(time_series=self.env[0].time_series,
-                            df=room.load_df[name + ' Total Load [W]'])
-            print(room.load_df)
+                            df=room.load_profile[name + ' Total Load [W]'])
+            print(room.load_profile)
         else:
             gui_func.clear_widget(widget=[tab.level_4_combo])
             tab.consumer = room.load_names
