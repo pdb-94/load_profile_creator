@@ -6,12 +6,12 @@ GUI module to create environment
 """
 
 import sys
+import datetime as dt
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.Qt import *
 from PyQt5.QtCore import *
 
-# TODO: Set Tooltip on information box 11117
 
 class Hospital(QWidget):
     """
@@ -34,9 +34,15 @@ class Hospital(QWidget):
         self.name_edit = QLineEdit()
 
         # Date Edit
-        self.start_time_edit = QDateTimeEdit(QDateTime.currentDateTime())
+        self.start_time_edit = QDateTimeEdit()
+        date = dt.datetime.today().date()
+        start_time = dt.time(hour=0, minute=0)
+        end_time = dt.time(hour=23, minute=59)
+        start_datetime = dt.datetime.combine(date, start_time)
+        end_time = dt.datetime.combine(date, end_time)
+        self.start_time_edit.setDateTime(start_datetime)
         self.start_time_edit.setCalendarPopup(True)
-        self.end_time_edit = QDateTimeEdit(QDateTime.currentDateTime().addDays(1))
+        self.end_time_edit = QDateTimeEdit(end_time)
         self.end_time_edit.setCalendarPopup(True)
         self.time_step_edit = QTimeEdit(QTime(0, 1))
 
