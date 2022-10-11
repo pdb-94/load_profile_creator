@@ -9,6 +9,8 @@ import os
 import numpy as np
 import pandas as pd
 import datetime as dt
+import random
+
 
 
 class Department:
@@ -83,6 +85,7 @@ class Room:
                               name=name,
                               data=data))
         self.load_names.append(name)
+        self.load_df[name + ' power [W]'] = self.load[-1].load_profile[name + ' power [W]']
 
 
 class Load:
@@ -140,24 +143,32 @@ class Load:
             self.sequential_load_profile()
         elif self.load_type == 'cycle':
             self.cycle_load_profile()
-        print(self.load_profile)
 
     def constant_load_profile(self):
         """
         Create load profile for constant loads
         :return:
         """
+        random_start = dt.timedelta(minutes=random.randrange(-15, 15, 1))
+        random_end = dt.timedelta(minutes=random.randrange(-15, 15, 1))
         env_start = self.env.time_series.iloc[0]
         env_end = self.env.time_series.iloc[-1]
-        self.load_profile.loc[env_start:self.t_start, self.name + ' power [W]'] = self.standby
-        self.load_profile.loc[self.t_start:self.t_end, self.name + ' power [W]'] = self.power
-        self.load_profile.loc[self.t_end:env_end, self.name + ' power [W]'] = self.standby
+        # Add random start/end time (max. +- 15 min)
+        if self.t_start + random_start < env_start:
+            load_start = self.t_start
+        else:
+            load_start = self.t_start + random_start
+        if self.t_end + random_end > env_end:
+            load_end = self.t_end
+        else:
+            load_end = self.t_end + random_end
+        # Build load profile using power/standby and load_start/load_end
+        self.load_profile.loc[env_start:load_start-dt.timedelta(minutes=1), self.name + ' power [W]'] = self.standby
+        self.load_profile.loc[load_start:load_end, self.name + ' power [W]'] = self.power
+        self.load_profile.loc[load_end+dt.timedelta(minutes=1):env_end, self.name + ' power [W]'] = self.standby
 
     def sequential_load_profile(self):
         pass
 
     def cycle_load_profile(self):
         pass
-
-
-
