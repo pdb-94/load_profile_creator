@@ -2,7 +2,7 @@
 Main module to run Load Profile Creator (LPC)
 
 @author: Paul Bohn
-@contributor: Paul Bohn, Moritz End
+@contributor: Paul Bohn (TH Köln), Moritz End (TH Köln)
 """
 
 __version__ = '0.1'
