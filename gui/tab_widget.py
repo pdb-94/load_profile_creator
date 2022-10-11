@@ -8,12 +8,10 @@ Main  GUI module of Load Profile Creator (LPC)
 __version__ = '0.1'
 __author__ = 'pdb-94'
 
-
 import sys
-import os
+import numpy as np
 import pandas as pd
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import datetime as dt
 # Import Gui Modules
@@ -23,19 +21,21 @@ from gui.department import Department
 from gui.room import Room
 from gui.load import Consumer
 from gui.load_profile import Load_profile
-from gui.plot import Plot
 from gui.popup_dialog import DeleteDialog
 import gui.gui_function as gui_func
 # Import HEyDU Modules
 from environment import Environment
 import models as md
 
+
 # TODO: Create function export_data
+
 
 class TabWidget(QWidget):
     """
     Class to create the main Window Frame of the LPC GUI
     """
+
     def __init__(self):
         super().__init__()
 
@@ -111,7 +111,7 @@ class TabWidget(QWidget):
         """
         # Get current Index from TabWidget and set current Index -=1
         index = self.tabs.currentIndex()
-        if index == len(self.tab_classes)-1:
+        if index == len(self.tab_classes) - 1:
             self.export_data()
         elif index < len(self.tab_classes):
             self.tabs.setCurrentIndex(index + 1)
@@ -393,10 +393,10 @@ class TabWidget(QWidget):
                 data = {'load_type': load_type, 'power [W]': power, 'standby [W]': standby, 'on': on, 'off': off,
                         'cycle_length': cycle_length,
                         'cycle': cycle, 'profile': profile}
-                self.env[0].department[dep_index].room[-1].load.append(md.Load(env=self.env[0],
-                                                                               name=load_name,
-                                                                               data=data))
-                self.env[0].department[dep_index].room[-1].load_names.append(load_name)
+                room = self.env[0].department[dep_index].room[-1]
+                room.load.append(md.Load(env=self.env[0], name=load_name, data=data))
+                room.load_names.append(load_name)
+                room.load_df[load_name + ' power [W]'] = room.load[-1].load_profile[load_name + ' power [W]']
 
     def create_load(self):
         """
@@ -430,7 +430,6 @@ class TabWidget(QWidget):
                                           tab.cycle_edit, tab.cycle_profile_edit, tab.profile_edit])
 
         # Create Load object in selected Department & Room in Environment
-        print(data)
         self.env[0].department[dep_index].room[room_index].create_load(name=name,
                                                                        data=data)
         # Add name to viewer
@@ -490,8 +489,14 @@ class TabWidget(QWidget):
                 dep_index = tab(index).department_combo.currentIndex()
                 room_index = tab(index).room_combo.currentIndex()
                 load_index = tab(index).viewer.currentRow()
-                self.env[0].department[dep_index].room[room_index].load.pop(load_index)
-                self.env[0].department[dep_index].room[room_index].load_names.pop(load_index)
+                room = self.env[0].department[dep_index].room[room_index]
+                # Delete load
+                if load_index == tab(index).viewer.count() - 1:
+                    load_index = tab(index).viewer.count()
+                name = self.env[0].department[dep_index].room[room_index].load_names[load_index]
+                room.load.pop(load_index)
+                room.load_names.pop(load_index)
+                room.load_df = room.load_df.drop([name + ' power [W]'], axis=1)
 
     def add_room_combo(self):
         """
@@ -610,8 +615,11 @@ class TabWidget(QWidget):
         room = self.env[0].department[dep_index].room[room_index]
         name = room.name
         if tab.level_1_combo.currentIndex() == 2:
+            room.load_df[name + ' Total Load [W]'] = np.nan
+            room.load_df[name + ' Total Load [W]'] = room.load_df.sum(axis=1)
             tab.adjust_plot(time_series=self.env[0].time_series,
                             df=room.load_df[name + ' Total Load [W]'])
+            print(room.load_df)
         else:
             gui_func.clear_widget(widget=[tab.level_4_combo])
             tab.consumer = room.load_names
@@ -626,7 +634,6 @@ class TabWidget(QWidget):
         dep_index = tab.level_2_combo.currentIndex()
         room_index = tab.level_3_combo.currentIndex()
         load_index = tab.level_4_combo.currentIndex()
-        room = self.env[0].department[dep_index].room[room_index]
         load = self.env[0].department[dep_index].room[room_index].load[load_index]
         name = load.name
         tab.adjust_plot(time_series=self.env[0].time_series,
