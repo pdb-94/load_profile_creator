@@ -31,8 +31,6 @@ def convert_datetime(start: str, end: str, step: str):
     return t_start, t_end, t_step
 
 
-
-
 def convert_time(text: str):
     """
     Convert text into int
