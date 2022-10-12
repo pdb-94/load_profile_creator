@@ -5,19 +5,17 @@ Module to display plot in GUI
 @contributor: Paul Bohn
 """
 
-import sys
 import datetime as dt
 import numpy as np
 import pandas as pd
-from PyQt5 import QtCore, QtWidgets
 import matplotlib
 import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
 
 matplotlib.use('Qt5Agg')
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT as NavigationToolbar
 
 # TODO: show time on x-axis not date
+
 
 class Plot(FigureCanvasQTAgg):
     """

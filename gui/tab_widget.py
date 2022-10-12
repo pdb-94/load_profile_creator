@@ -244,13 +244,14 @@ class TabWidget(QWidget):
         """
         tab = self.tabs.widget
         name = tab(1).name_edit.text()
-        start_str = tab(1).start_time_edit.text()
-        end_str = tab(1).end_time_edit.text()
-        step_str = tab(1).time_step_edit.text()
-        time_data = gui_func.convert_datetime(start=start_str, end=end_str, step=step_str)
+        start_time = tab(1).start_time_edit.text()
+        end_time = tab(1).end_time_edit.text()
+        time_step = tab(1).time_step_edit.text()
+        time_data = gui_func.convert_datetime(start=start_time, end=end_time, step=time_step)
         if time_data[1] < time_data[0]:
             print('End time < Start Time. Please choose valid time frame.')
         else:
+            # Create Environment object in self.env[0]
             self.env[0] = Environment(name=name,
                                       time_data=time_data)
             # Add Hospital to viewer
@@ -274,8 +275,8 @@ class TabWidget(QWidget):
         name = tab(2).name_edit.text()
         # Time Data
         start_str = tab(2).start_time_edit.text()
-        start = gui_func.convert_time(text=start_str)
         end_str = tab(2).end_time_edit.text()
+        start = gui_func.convert_time(text=start_str)
         end = gui_func.convert_time(text=end_str)
         # Create department object in Environment
         self.env[0].create_department(name=name,
@@ -310,15 +311,15 @@ class TabWidget(QWidget):
         Get individual room parameters and create room object in selected Department
         :param dep_index: int
             department index
-        :return:
+        :return: None
         """
         tab = self.tabs.widget(3)
-        # Time data
+        # Name
         name = tab.name_edit.text()
         # Time data
         start_str = tab.start_time_edit.text()
-        start = gui_func.convert_time(text=start_str)
         end_str = tab.end_time_edit.text()
+        start = gui_func.convert_time(text=start_str)
         end = gui_func.convert_time(text=end_str)
         t_start = dt.time(hour=start[0], minute=start[1])
         t_end = dt.time(hour=end[0], minute=end[1])
@@ -439,7 +440,7 @@ class TabWidget(QWidget):
     def create_directory(self):
         """
         Create export directory
-        :return:
+        :return: None
         """
         # root = sys.path[1]
         root = 'C:/Users/Rummeny/PycharmProjects/hospital_load_model'
@@ -453,26 +454,28 @@ class TabWidget(QWidget):
         for sub_dir in sub_directory:
             if not os.path.exists(folder+sub_dir):
                 os.makedirs(folder+sub_dir)
-        self.export_data(df=self.env[0],
+        self.export_data(load=self.env[0],
                          path=root+directory+sub_directory[0])
         for i in range(len(self.env[0].department)):
-            self.export_data(df=self.env[0].department[i],
+            self.export_data(load=self.env[0].department[i],
                              path=root + directory + sub_directory[1])
             for k in range(len(self.env[0].department[i].room)):
-                self.export_data(df=self.env[0].department[i].room[k],
+                self.export_data(load=self.env[0].department[i].room[k],
                                  path=root + directory + sub_directory[2])
                 for j in range(len(self.env[0].department[i].room[k].load)):
-                    self.export_data(df=self.env[0].department[i].room[k].load[j],
+                    self.export_data(load=self.env[0].department[i].room[k].load[j],
                                      path=root + directory + sub_directory[3])
 
-    def export_data(self, df=None, path: str = None):
+    def export_data(self, load=None, path: str = None):
         """
         Export data
-        :param path:
-        :param df:
-        :return:
+        :param load: object
+            Environment; Department; Room; Load
+        :param path: str
+            export_path
+        :return: None
         """
-        df.load_profile.to_csv(path + '/' + df.name + '.csv', sep=';', decimal=',')
+        load.load_profile.to_csv(path + '/' + load.name + '.csv', sep=';', decimal=',')
 
     def delete(self):
         """
@@ -584,6 +587,7 @@ class TabWidget(QWidget):
                                      tab.level_4_combo, tab.level_4],
                              show=False)
         # Add Items to load profile ComboBox based on selection in level ComboBox
+        tab.department = self.env[0].department_names
         if isinstance(self.env[0], Environment):
             gui_func.enable_widget(widget=[tab.level_1_combo], enable=True)
             if level == 0:
@@ -596,11 +600,9 @@ class TabWidget(QWidget):
                 gui_func.clear_widget(widget=[tab.level_2_combo])
                 gui_func.show_widget(widget=[tab.level_2_combo, tab.level_2], show=True)
                 gui_func.enable_widget(widget=[tab.level_2_combo], enable=True)
-                tab.department = self.env[0].department_names
                 gui_func.add_combo(widget=tab.level_2_combo, name=tab.department)
             elif level == 2:
                 gui_func.clear_widget(widget=[tab.level_2_combo])
-                tab.department = self.env[0].department_names
                 gui_func.add_combo(widget=tab.level_2_combo, name=tab.department)
                 # Show and enable level_2 and level_3_combo
                 gui_func.enable_widget(widget=[tab.level_2_combo, tab.level_3_combo], enable=True)
@@ -608,7 +610,6 @@ class TabWidget(QWidget):
                                              tab.level_3_combo, tab.level_3],
                                      show=True)
             elif level == 3:
-                tab.department = self.env[0].department_names
                 gui_func.add_combo(widget=tab.level_2_combo, name=tab.department)
                 gui_func.enable_widget(widget=[tab.level_2_combo, tab.level_3_combo, tab.level_4_combo], enable=True)
                 gui_func.show_widget(widget=[tab.level_2_combo, tab.level_2,
