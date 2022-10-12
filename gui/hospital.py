@@ -5,10 +5,7 @@ GUI module to create environment
 @contributor: Paul Bohn
 """
 
-import sys
 import datetime as dt
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
 from PyQt5.Qt import *
 from PyQt5.QtCore import *
 

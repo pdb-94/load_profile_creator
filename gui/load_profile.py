@@ -9,12 +9,8 @@ __version__ = '0.1'
 __author__ = 'pdb-94'
 
 
-import sys
 import pandas as pd
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from PyQt5 import Qt
-from PyQt5 import QtCore
 from gui.plot import *
 
 
@@ -74,7 +70,7 @@ class Load_profile(QWidget):
         """
         Plot DataFrame based on parameter load_profile
         :param time_series: pd.Series
-            environemnt time_series
+            environment time_series
         :param df: pd.Series
             load_df
         :return: None

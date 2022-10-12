@@ -5,11 +5,7 @@ GUI module to create load
 @contributor: Paul Bohn
 """
 
-import sys
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
 from PyQt5.Qt import *
-from PyQt5.QtCore import *
 
 
 class Consumer(QWidget):
@@ -38,7 +34,6 @@ class Consumer(QWidget):
         self.power_edit = QLineEdit()
         self.standby_edit = QLineEdit()
 
-
         # ComboBox
         self.department_combo = QComboBox()
         self.room_combo = QComboBox()
@@ -50,7 +45,7 @@ class Consumer(QWidget):
         # ListWidget
         self.viewer = QListWidget()
 
-        # Additional wigdets
+        # Additional widgets
         self.cycle = QLabel('Cycle length')
         self.cycle_edit = QLineEdit()
         self.cycle_profile = QLabel('Load cycle')

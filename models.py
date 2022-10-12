@@ -5,12 +5,10 @@ Module including Classes Department, Room and Load
 @contributor: Paul Bohn
 """
 
-import os
 import numpy as np
 import pandas as pd
 import datetime as dt
 import random
-
 
 
 class Department:
