@@ -8,6 +8,30 @@ Module including GUI functions
 __version__ = '0.1'
 __author__ = 'pdb-94'
 
+import datetime as dt
+
+
+def convert_datetime(start: str, end: str, step: str):
+    """
+    Convert env datetime str to dt.datetime
+    :param start: str
+        start time
+    :param end: str
+        end time
+    :param step: str
+        timestep
+    :return:
+    """
+    t_start = dt.datetime.strptime(start, '%d.%m.%Y %H:%M')
+    t_end = dt.datetime.strptime(end, '%d.%m.%Y %H:%M')
+    t_step = dt.datetime.strptime(step, '%H:%M')
+    help_date = dt.datetime(year=1900, month=1, day=1, hour=0, minute=0)
+    t_step = t_step - help_date
+
+    return t_start, t_end, t_step
+
+
+
 
 def convert_time(text: str):
     """

@@ -91,19 +91,21 @@ class TabWidget(QWidget):
         self.setWindowTitle('Load Profile Creator')
         self.show()
 
-        # Assign functions to Widgets
+        # Assign functions to Tabs an PushButtons
         self.tabs.currentChanged.connect(self.tab_changed)
         self.delete_btn.clicked.connect(self.delete)
         self.save_btn.clicked.connect(self.save)
         self.return_btn.clicked.connect(self.previous_tab)
         self.next_btn.clicked.connect(self.next_tab)
-        self.tabs.widget(3).department_combo.currentIndexChanged.connect(self.add_room_combo)
-        self.tabs.widget(4).department_combo.currentIndexChanged.connect(self.add_room_combo)
-        self.tabs.widget(4).room_combo.currentIndexChanged.connect(self.add_consumer_combo)
-        self.tabs.widget(5).level_1_combo.currentIndexChanged.connect(self.change_load_profile)
-        self.tabs.widget(5).level_2_combo.currentIndexChanged.connect(self.department_load_profile)
-        self.tabs.widget(5).level_3_combo.currentIndexChanged.connect(self.room_load_profile)
-        self.tabs.widget(5).level_4_combo.currentIndexChanged.connect(self.consumer_load_profile)
+        # Assign Functions to widgets in tabs
+        tab = self.tabs.widget
+        tab(3).department_combo.currentIndexChanged.connect(self.add_room_combo)
+        tab(4).department_combo.currentIndexChanged.connect(self.add_room_combo)
+        tab(4).room_combo.currentIndexChanged.connect(self.add_consumer_combo)
+        tab(5).level_1_combo.currentIndexChanged.connect(self.change_load_profile)
+        tab(5).level_2_combo.currentIndexChanged.connect(self.department_load_profile)
+        tab(5).level_3_combo.currentIndexChanged.connect(self.room_load_profile)
+        tab(5).level_4_combo.currentIndexChanged.connect(self.consumer_load_profile)
 
     def next_tab(self):
         """
@@ -243,18 +245,14 @@ class TabWidget(QWidget):
         tab = self.tabs.widget
         name = tab(1).name_edit.text()
         start_str = tab(1).start_time_edit.text()
-        start = dt.datetime.strptime(start_str, '%d.%m.%Y %H:%M')
         end_str = tab(1).end_time_edit.text()
-        end = dt.datetime.strptime(end_str, '%d.%m.%Y %H:%M')
         step_str = tab(1).time_step_edit.text()
-        step_time = dt.datetime.strptime(step_str, '%H:%M')
-        help_time = dt.datetime(year=1900, month=1, day=1, hour=0, minute=0)
-        step = step_time - help_time
-        if end < start:
+        time_data = gui_func.convert_datetime(start=start_str, end=end_str, step=step_str)
+        if time_data[1] < time_data[0]:
             print('End time < Start Time. Please choose valid time frame.')
         else:
             self.env[0] = Environment(name=name,
-                                      time_data=[start, end, step])
+                                      time_data=time_data)
             # Add Hospital to viewer
             if isinstance(self.env[0], Environment):
                 gui_func.delete_from_viewer(widget=tab(self.tabs.currentIndex()), item=0)
