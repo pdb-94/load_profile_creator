@@ -8,7 +8,6 @@ Module including class Environment
 import os
 import pandas as pd
 import datetime as dt
-import matplotlib.pyplot as plt
 # LPC Libraries
 import models as md
 
@@ -33,8 +32,7 @@ class Environment:
         self.load_profile = pd.DataFrame(index=self.time_series, columns=columns)
         self.load_profile['Total Load [W]'] = 100  # TODO: delete Statement
         # DataBase
-        # self.database = self.import_database()
-        # print(self.database)
+        self.database = self.import_database()
 
         self.import_standard_room()
 
@@ -78,7 +76,6 @@ class Environment:
 
         """
         path = os.getcwd()
-        dir = 'data'
         df = pd.read_csv(path + '/data/database.csv', sep=';', decimal=',')
 
         return df
@@ -89,11 +86,11 @@ class Environment:
         :return:
         """
         path = os.getcwd()
-        dir = '/data/room'
-        files = next(os.walk(path+dir), (None, None, []))[2]
+        directory = '/data/room'
+        files = next(os.walk(path+directory), (None, None, []))[2]
         csv_files = [file for file in files if file.endswith('.csv')]
         for file in csv_files:
-            self.standard_room.append(pd.read_csv(path + dir + '/' + file, sep=';', decimal=','))
+            self.standard_room.append(pd.read_csv(path + directory + '/' + file, sep=';', decimal=','))
 
 
 if __name__ == '__main__':
@@ -102,7 +99,3 @@ if __name__ == '__main__':
     environment = Environment('Hospital', time_data=[dt.datetime(year=2022, month=9, day=29, hour=0, minute=0),
                                                      dt.datetime(year=2022, month=9, day=29, hour=23, minute=59),
                                                      dt.timedelta(minutes=1)])
-
-    # files = next(os.walk(path+dir), (None, None, []))[2]
-    # csv_files = [file for file in files if file.endswith('.csv')]
-    # header = [0, 1, 2, 3, 4, 5, 6]
