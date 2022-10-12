@@ -102,19 +102,36 @@ class Load:
         self.load_type = self.data['load_type']
         self.power = float(self.data['power [W]'])
         self.standby = float(self.data['standby [W]'])
-        if self.load_type == 'constant':
-            # Combine start time and date
-            on = self.data['on']
-            off = self.data['off']
-            start_date = self.env.time_series.iloc[0].date()
-            end_date = self.env.time_series.iloc[-1].date()
-            self.t_start = dt.datetime.combine(start_date, on)
-            self.t_end = dt.datetime.combine(end_date, off)
-        else:
+
+        # Combine start time and date
+        self.on = self.data['on']
+        self.off = self.data['off']
+        start_date = self.env.time_series.iloc[0].date()
+        end_date = self.env.time_series.iloc[-1].date()
+        self.t_start = dt.datetime.combine(start_date, self.on)
+        self.t_end = dt.datetime.combine(end_date, self.off)
+        if self.load_type == 'sequential':
             if self.data['cycle_length'] == '':
                 pass
             else:
                 self.cycle_length = int(self.data['cycle_length'])
+            if self.data['interval open'] == '':
+                pass
+            else:
+                self.interval_open = int(self.data['interval open'])
+            if self.data['interval close'] == '':
+                pass
+            else:
+                self.interval_close = int(self.data['interval close'])
+            if self.data['cycle'] == '':
+                pass
+            else:
+                self.cycle = pd.read_csv(self.data['cycle'])
+        else:
+            if self.data['cycle_length'] == '':
+                pass
+            else:
+                self.cycle_length = self.data['cycle_length']
             if self.data['cycle'] == '':
                 pass
             else:
@@ -123,7 +140,6 @@ class Load:
                 pass
             else:
                 self.profile = pd.read_csv(self.data['profile'])
-
         # Create time_series and load_df
         self.time_series = self.env.time_series
         columns = [name + ' power [W]']
@@ -145,28 +161,54 @@ class Load:
     def constant_load_profile(self):
         """
         Create load profile for constant loads
-        :return:
+        :return: None
         """
-        random_start = dt.timedelta(minutes=random.randrange(-15, 15, 1))
-        random_end = dt.timedelta(minutes=random.randrange(-15, 15, 1))
+        start_diff = dt.timedelta(minutes=random.randrange(-15, 15, 1))
+        end_diff = dt.timedelta(minutes=random.randrange(-15, 15, 1))
         env_start = self.env.time_series.iloc[0]
         env_end = self.env.time_series.iloc[-1]
         # Add random start/end time (max. +- 15 min)
-        if self.t_start + random_start < env_start:
+        if self.t_start + start_diff < env_start:
             load_start = self.t_start
         else:
-            load_start = self.t_start + random_start
-        if self.t_end + random_end > env_end:
+            load_start = self.t_start + start_diff
+        if self.t_end + end_diff > env_end:
             load_end = self.t_end
         else:
-            load_end = self.t_end + random_end
+            load_end = self.t_end + end_diff
         # Build load profile using power/standby and load_start/load_end
         self.load_profile.loc[env_start:load_start-dt.timedelta(minutes=1), self.name + ' power [W]'] = self.standby
         self.load_profile.loc[load_start:load_end, self.name + ' power [W]'] = self.power
         self.load_profile.loc[load_end+dt.timedelta(minutes=1):env_end, self.name + ' power [W]'] = self.standby
 
     def sequential_load_profile(self):
-        pass
+        """
+        Create load profile for sequential loads
+        :return: None
+        """
+        i_start = self.on.hour * 60 + self.on.minute
+        i_end = self.off.hour * 60 + self.off.minute
+        time_diff = dt.timedelta(minutes=random.randrange(0, self.interval_open, 1))
+        # close sequences
+        for i in range(0, len(self.load_profile.index), self.interval_close):
+            if len(self.load_profile.index) - i < self.cycle_length:
+                pass
+            else:
+                for k in range(self.cycle_length):
+                    index = self.load_profile.index
+                    self.load_profile.loc[index[i]+time_diff:index[i+k]+time_diff, self.name + ' power [W]'] = self.power
+        # Overwrite open sequences with standby
+        self.load_profile.loc[self.t_start:self.t_end, self.name + ' power [W]'] = self.standby
+        # open sequence
+        for i in range(i_start, i_end, self.interval_open):
+            if len(self.load_profile.index) - i < self.cycle_length:
+                pass
+            else:
+                for k in range(self.cycle_length):
+                    self.load_profile.loc[self.load_profile.index[i + k], self.name + ' power [W]'] = self.power
+
+        # Fill nan values with standby
+        self.load_profile[self.name + ' power [W]'] = self.load_profile[self.name + ' power [W]'].fillna(self.standby)
 
     def cycle_load_profile(self):
         pass
