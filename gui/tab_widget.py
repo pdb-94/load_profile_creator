@@ -377,6 +377,8 @@ class TabWidget(QWidget):
             power = standard_room.loc[i, 'power [W]']
             standby = standard_room.loc[i, 'standby [W]']
             cycle_length = standard_room.loc[i, 'cycle length']
+            interval_open = standard_room.loc[i, 'interval (open)']
+            interval_close = standard_room.loc[i, 'interval (closed)']
             on = self.env[0].department[dep_index].t_start
             off = self.env[0].department[dep_index].t_end
             if load_type == 'constant':
@@ -391,11 +393,15 @@ class TabWidget(QWidget):
                 else:
                     load_name = load[i] + ' ' + str(k + 1)
                 data = {'load_type': load_type, 'power [W]': power, 'standby [W]': standby, 'on': on, 'off': off,
-                        'cycle_length': cycle_length,
+                        'cycle_length': cycle_length, 'interval open': interval_open, 'interval close': interval_close,
                         'cycle': cycle, 'profile': profile}
                 room = self.env[0].department[dep_index].room[-1]
-                room.load.append(md.Load(env=self.env[0], name=load_name, data=data))
+                # Create load object in room.load
+                room.load.append(md.Load(env=self.env[0],
+                                         name=load_name,
+                                         data=data))
                 room.load_names.append(load_name)
+                # Create columns for load in room load profile
                 room.load_profile[load_name + ' power [W]'] = room.load[-1].load_profile[load_name + ' power [W]']
 
     def create_load(self):
@@ -506,7 +512,7 @@ class TabWidget(QWidget):
                 self.env[0].department_names.pop(item_index)
                 gui_func.delete_from_combo(combo=tab(3).department_combo, index=item_index)
                 gui_func.delete_from_combo(combo=tab(4).department_combo, index=item_index)
-                tab(6).department.pop(item_index)
+                tab(5).department.pop(item_index)
             elif index == 3:
                 # Tab Room: Delete Item based on selected department in dep_combo and room_viewer
                 gui_func.delete_from_viewer(widget=tab(index), item=item_index)
@@ -649,7 +655,6 @@ class TabWidget(QWidget):
             room.load_profile[name + ' Total Load [W]'] = room.load_profile.sum(axis=1)
             tab.adjust_plot(time_series=self.env[0].time_series,
                             df=room.load_profile[name + ' Total Load [W]'])
-            print(room.load_profile)
         else:
             gui_func.clear_widget(widget=[tab.level_4_combo])
             tab.consumer = room.load_names
