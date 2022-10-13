@@ -372,7 +372,6 @@ class TabWidget(QWidget):
         load = list(standard_room['device'])
         load_quantity = list(standard_room['quantity'])
         # Create load objects from standard room
-        # TODO: cycle and profile
         for i in range(len(load)):
             load_type = standard_room.loc[i, 'type']
             power = standard_room.loc[i, 'power [W]']
@@ -383,19 +382,22 @@ class TabWidget(QWidget):
             on = self.env[0].department[dep_index].t_start
             off = self.env[0].department[dep_index].t_end
             if load_type == 'constant':
-                cycle = ''
-                profile = ''
+                data = {'load_type': load_type, 'power [W]': power, 'standby [W]': standby, 'on': on, 'off': off}
+            elif load_type == 'sequential':
+                data = {'load_type': load_type, 'power [W]': power, 'standby [W]': standby,
+                        'cycle_length': cycle_length, 'interval_open': interval_open,
+                        'interval_close': interval_close, 'on': on, 'off': off}
             else:
-                cycle = ''
-                profile = ''
+                cycle = root + '/data/load/profile/' + load[i] + '_cycle.csv.'
+                profile = root + '/data/load/cycle/' + load[i] + '_profile/csv.'
+                data = {'load_type': load_type, 'power [W]': power, 'standby [W]': standby,
+                        'cycle_length': cycle_length,
+                        'profile': profile, 'cycle': cycle}
             for k in range(load_quantity[i]):
                 if load_quantity[i] == 1:
                     load_name = load[i]
                 else:
                     load_name = load[i] + ' ' + str(k + 1)
-                data = {'load_type': load_type, 'power [W]': power, 'standby [W]': standby, 'on': on, 'off': off,
-                        'cycle_length': cycle_length, 'interval open': interval_open, 'interval close': interval_close,
-                        'cycle': cycle, 'profile': profile}
                 room = self.env[0].department[dep_index].room[-1]
                 # Create load object in room.load
                 room.load.append(md.Load(env=self.env[0],
@@ -461,16 +463,25 @@ class TabWidget(QWidget):
                 return
             else:
                 cycle_length = int(cycle_length)
-            if cycle == '':
-                print('Please return path to cycle csv-file.')
+            if os.path.exists(cycle):
+                pass
+            else:
+                print('File cycle: ' + str(cycle) + ' does not exist.')
+                gui_func.clear_widget(widget=[tab.name_edit, tab.power_edit, tab.standby_edit,
+                                              tab.cycle_length_edit, tab.cycle_edit, tab.profile_edit])
                 return
-            if profile == '':
-                print('Please return path to profile csv-file.')
+            if os.path.exists(profile):
+                pass
+            else:
+                print('File cycle: ' + str(profile) + ' does not exist.')
+                gui_func.clear_widget(widget=[tab.name_edit, tab.power_edit, tab.standby_edit,
+                                              tab.cycle_length_edit, tab.cycle_edit, tab.profile_edit])
                 return
+
             data = {'load_type': load_type, 'power [W]': power, 'standby [W]': standby, 'cycle_length': cycle_length,
                     'profile': profile, 'cycle': cycle}
             gui_func.clear_widget(widget=[tab.name_edit, tab.power_edit, tab.standby_edit,
-                                          tab.cycle_length_edit, tab.icycle_edit, tab.profile_edit])
+                                          tab.cycle_length_edit, tab.cycle_edit, tab.profile_edit])
 
         # Create Load object in selected Department & Room in Environment
         self.env[0].department[dep_index].room[room_index].create_load(name=name,

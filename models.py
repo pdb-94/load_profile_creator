@@ -6,6 +6,7 @@ Module including Classes Department, Room and Load
 """
 
 import numpy as np
+from os.path import exists
 import pandas as pd
 import datetime as dt
 import random
@@ -192,4 +193,21 @@ class Load:
         self.load_profile[self.name + ' power [W]'] = self.load_profile[self.name + ' power [W]'].fillna(self.standby)
 
     def cycle_load_profile(self):
-        pass
+        """
+        Create load profile for cycle loads
+        :return: None
+        """
+        cycle_length = len(self.cycle.index)
+        self.load_profile[self.name + ' power [W]'] = self.profile.values
+        for i in range(len(self.load_profile.index)):
+            index = self.load_profile.index
+            # Check if Status is turned on
+            if self.load_profile.loc[index[i], self.name + ' power [W]'] == True:
+                print(self.load_profile.loc[index[i], self.name + ' power [W]'])
+                # Check if cycle is longer than index
+                if i + cycle_length < len(index):
+                    self.load_profile.loc[index[i]:index[i+cycle_length-1]] = self.cycle.values
+        # Replace False values with standby
+        self.load_profile[self.name + ' power [W]'] = self.load_profile[self.name + ' power [W]'].replace(False, self.standby)
+
+
