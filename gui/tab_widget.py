@@ -200,6 +200,7 @@ class TabWidget(QWidget):
             gui_func.change_widget_text(widget=[self.next_btn], text=['Export Data'])
             gui_func.show_widget(widget=[self.delete_btn, self.save_btn], show=False)
             gui_func.enable_widget(widget=[self.save_btn, self.return_btn], enable=True)
+            self.build_load_profiles()
             if isinstance(self.env[0], Environment):
                 gui_func.enable_widget(widget=[tab.level_1_combo], enable=True)
             else:
@@ -425,15 +426,51 @@ class TabWidget(QWidget):
             off = self.env[0].department[dep_index].room[room_index].t_end
             data = {'load_type': load_type, 'power [W]': power, 'standby [W]': standby, 'on': on, 'off': off}
             gui_func.clear_widget(widget=[tab.name_edit, tab.power_edit, tab.standby_edit])
-        else:
+        elif load_type == 'sequential':
             # Sequential load
-            cycle_length = tab.cycle_edit.text()
-            cycle = tab.cycle_profile_edit.text()
-            profile = tab.profile_edit.text()
+            on = self.env[0].department[dep_index].room[room_index].t_start
+            off = self.env[0].department[dep_index].room[room_index].t_end
+            cycle_length = tab.cycle_length_edit.text()
+            interval_open = tab.interval_open_edit.text()
+            interval_closed = tab.interval_closed_edit.text()
+            if cycle_length == '':
+                print('Please type in cycle length [min]')
+                return
+            else:
+                cycle_length = int(cycle_length)
+            if interval_open == '':
+                print('Please type in interval (open) [min]')
+                return
+            else:
+                interval_open = int(interval_open)
+            if interval_closed == '':
+                print('Please type in interval (closed) [min]')
+                return
+            else:
+                interval_closed = int(interval_closed)
             data = {'load_type': load_type, 'power [W]': power, 'standby [W]': standby, 'cycle_length': cycle_length,
-                    'cycle': cycle, 'profile': profile}
+                    'interval_open': interval_open, 'interval_close': interval_closed, 'on': on, 'off': off}
             gui_func.clear_widget(widget=[tab.name_edit, tab.power_edit, tab.standby_edit,
-                                          tab.cycle_edit, tab.cycle_profile_edit, tab.profile_edit])
+                                          tab.cycle_length_edit, tab.interval_open_edit, tab.interval_closed_edit])
+        elif load_type == 'cycle':
+            cycle_length = tab.cycle_length_edit.text()
+            cycle = tab.cycle_edit.text()
+            profile = tab.profile_edit.text()
+            if cycle_length == '':
+                print('Please put in cycle length [min]')
+                return
+            else:
+                cycle_length = int(cycle_length)
+            if cycle == '':
+                print('Please return path to cycle csv-file.')
+                return
+            if profile == '':
+                print('Please return path to profile csv-file.')
+                return
+            data = {'load_type': load_type, 'power [W]': power, 'standby [W]': standby, 'cycle_length': cycle_length,
+                    'profile': profile, 'cycle': cycle}
+            gui_func.clear_widget(widget=[tab.name_edit, tab.power_edit, tab.standby_edit,
+                                          tab.cycle_length_edit, tab.icycle_edit, tab.profile_edit])
 
         # Create Load object in selected Department & Room in Environment
         self.env[0].department[dep_index].room[room_index].create_load(name=name,
@@ -635,6 +672,15 @@ class TabWidget(QWidget):
         if tab.level_1_combo.currentIndex() == 1:
             tab.adjust_plot(time_series=self.env[0].time_series,
                             df=dep.load_profile[name + ' Total Load [W]'])
+            # Summarize department load_profile
+            # dep.load_profile[name + ' Total Load [W]'] = np.nan
+            # for i in range(len(dep.room)):
+            #     room_name = dep.room_names[i]
+            #     dep.load_profile[room_name + ' power [W]'] = dep.room[i].load_profile[room_name+ ' Total Load [W]']
+            # dep.load_profile[name + ' Total Load [W]'] = dep.load_profile.sum(axis=1)
+            # # for room in dep.room:
+            # #     room_name = dep.room_names[room]
+            # #     dep.load_profile[room_name + ' power [W]'] = dep.room
         else:
             gui_func.clear_widget(widget=[tab.level_3_combo])
             tab.room = dep.room_names
@@ -651,8 +697,8 @@ class TabWidget(QWidget):
         room = self.env[0].department[dep_index].room[room_index]
         name = room.name
         if tab.level_1_combo.currentIndex() == 2:
-            room.load_profile[name + ' Total Load [W]'] = np.nan
-            room.load_profile[name + ' Total Load [W]'] = room.load_profile.sum(axis=1)
+            # room.load_profile[name + ' Total Load [W]'] = np.nan
+            # room.load_profile[name + ' Total Load [W]'] = room.load_profile.sum(axis=1)
             tab.adjust_plot(time_series=self.env[0].time_series,
                             df=room.load_profile[name + ' Total Load [W]'])
         else:
@@ -673,6 +719,36 @@ class TabWidget(QWidget):
         name = load.name
         tab.adjust_plot(time_series=self.env[0].time_series,
                         df=load.load_profile[name + ' power [W]'])
+
+    def build_load_profiles(self):
+        """
+
+        :return: None
+        """
+
+        if isinstance(self.env[0], Environment):
+            env = self.env[0]
+            if len(env.department) > 0:
+                for i in range(len(env.department)):
+                    dep = env.department[i]
+                    if len(dep.room) > 0:
+                        for k in range(len(dep.room)):
+                            room = dep.room[k]
+                            if len(room.load) > 0:
+                                for j in range(len(room.load)):
+                                    load = room.load[j]
+                                    room.load_profile[load.name + ' power [W]'] = load.load_profile[load.name + ' power [W]']
+                                    print(room.load_profile[load.name + ' power [W]'])
+                            room.load_profile[room.name + ' Total Power [W]'] = np.nan
+                            room.load_profile[room.name + ' Total Power [W]'] = room.load_profile.sum(axis=1)
+                            dep.load_profile[room.name + ' Total Power [W]'] = room.load_profile[room.name + ' Total Power [W]']
+                            print(dep.load_profile[room.name + ' Total Power [W]'])
+                    dep.load_profile[dep.name + ' Total Power [W]'] = np.nan
+                    dep.load_profile[dep.name + ' Total Power [W]'] = dep.load_profile.sum(axis=1)
+                    env.load_profile[dep.name + ' Total Power [W]'] = dep.load_profile[dep.name + ' Total Power [W]']
+                    print(env.load_profile[dep.name + ' Total Power [W]'])
+            env.load_profile[env.name + ' Total Power [W]'] = np.nan
+            env.load_profile[env.name + ' Total Power [W]'] = env.load_profile.sum(axis=1)
 
 
 if __name__ == '__main__':

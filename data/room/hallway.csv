@@ -1,3 +1,3 @@
-﻿quantity;device;manufacturer;model;group;priority;type;power [W];standby [W];cycle length;Source
-1;Ceiling Fan;;;Technical;C;constant;60;0;0;EnerShelF Data
-4;Light;;;Lighting;C;constant;20;0;0;EnerShelF Data
+﻿quantity;device;manufacturer;model;group;priority;type;power [W];standby [W];cycle length;interval (open);interval (closed);source
+1;Ceiling Fan;;;Technical;C;constant;60;0;0;;;EnerShelF measured data
+4;Light;;;Lighting;C;constant;20;0;0;;;EnerShelF measured data
