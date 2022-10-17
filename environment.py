@@ -6,6 +6,7 @@ Module including class Environment
 """
 
 import os
+import sys
 import pandas as pd
 import datetime as dt
 import numpy as np
@@ -77,8 +78,9 @@ class Environment:
         :return: df
 
         """
-        path = os.getcwd()
-        df = pd.read_csv(path + '/data/database.csv', sep=';', decimal=',')
+        root = sys.path[1]
+        root = 'C:/Users/Rummeny/PycharmProjects/hospital_load_model'  # TODO: Remove Statement
+        df = pd.read_csv(root + '/data/database.csv', sep=';', decimal=',')
 
         return df
 
@@ -87,12 +89,17 @@ class Environment:
         Import default rooms
         :return:
         """
-        path = os.getcwd()
+        # root = sys.path[1]
+        root = 'C:/Users/Rummeny/PycharmProjects/hospital_load_model'  # TODO: Remove Statement
         directory = '/data/room'
-        files = next(os.walk(path+directory), (None, None, []))[2]
+        files = next(os.walk(root+directory), (None, None, []))[2]
         csv_files = [file for file in files if file.endswith('.csv')]
         for file in csv_files:
-            self.standard_room.append(pd.read_csv(path + directory + '/' + file, sep=';', decimal=','))
+            self.standard_room.append(pd.read_csv(root + directory + '/' + file, sep=';', decimal=','))#
+
+    def clear_load_profile(self):
+        for col in self.load_profile.columns:
+            col.drop()
 
 
 if __name__ == '__main__':

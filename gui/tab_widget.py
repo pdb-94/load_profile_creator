@@ -100,7 +100,6 @@ class TabWidget(QWidget):
         tab(4).department_combo.currentIndexChanged.connect(self.add_room_combo)
         tab(4).room_combo.currentIndexChanged.connect(self.add_consumer_combo)
         tab(5).level_1_combo.currentIndexChanged.connect(self.change_load_profile)
-        tab(5).level_1_combo.currentIndexChanged.connect(self.build_load_profiles)
         tab(5).level_2_combo.currentIndexChanged.connect(self.department_load_profile)
         tab(5).level_3_combo.currentIndexChanged.connect(self.room_load_profile)
         tab(5).level_4_combo.currentIndexChanged.connect(self.consumer_load_profile)
@@ -219,7 +218,7 @@ class TabWidget(QWidget):
         elif index == 2:
             # Tab Department
             if isinstance(self.env[0], Environment):
-                # Create operator from user Input
+                # Run function create department
                 self.create_department()
             else:
                 print('Setup Hospital data before creating department.')
@@ -655,10 +654,10 @@ class TabWidget(QWidget):
                 # Delete load
                 if load_index == tab(index).viewer.count() - 1:
                     load_index = tab(index).viewer.count()
-                name = self.env[0].department[dep_index].room[room_index].load_names[load_index]
+                print(room.load_names[load_index])
+                print(room.load[load_index])
                 room.load.pop(load_index)
                 room.load_names.pop(load_index)
-                room.load_profile = room.load_profile.drop([name + ' power [W]'], axis=1)
 
     # Add to ComboBoxes
     def add_room_combo(self):
@@ -757,13 +756,16 @@ class TabWidget(QWidget):
         """
         tab = self.tabs.widget(5)
         dep_index = tab.level_2_combo.currentIndex()
+        if dep_index == -1:
+            tab.clear_plot()
+            return
         dep = self.env[0].department[dep_index]
         name = dep.name
         if tab.level_1_combo.currentIndex() == 1:
             tab.adjust_plot(time_series=self.env[0].time_series,
                             df=dep.load_profile[name + ' Total Load [W]'])
         else:
-            gui_func.clear_widget(widget=[tab.level_3_combo])
+            gui_func.clear_widget(widget=[tab.level_3_combo, tab.level_4_combo])
             tab.department = dep.room_names
             gui_func.add_combo(widget=tab.level_3_combo, name=tab.department)
 
@@ -775,6 +777,10 @@ class TabWidget(QWidget):
         tab = self.tabs.widget(5)
         dep_index = tab.level_2_combo.currentIndex()
         room_index = tab.level_3_combo.currentIndex()
+        indexes = [dep_index, room_index]
+        if -1 in indexes:
+            tab.clear_plot()
+            return
         room = self.env[0].department[dep_index].room[room_index]
         name = room.name
         if tab.level_1_combo.currentIndex() == 2:
@@ -796,6 +802,10 @@ class TabWidget(QWidget):
         dep_index = tab.level_2_combo.currentIndex()
         room_index = tab.level_3_combo.currentIndex()
         load_index = tab.level_4_combo.currentIndex()
+        indexes = [dep_index, room_index, load_index]
+        if -1 in indexes:
+            tab.clear_plot()
+            return
         load = self.env[0].department[dep_index].room[room_index].load[load_index]
         name = load.name
         tab.adjust_plot(time_series=self.env[0].time_series,

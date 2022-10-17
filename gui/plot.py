@@ -22,9 +22,9 @@ class Plot(FigureCanvasQTAgg):
     Class containing plot
     """
     def __init__(self, df: pd.Series = None, time_series: pd.Series = None, parent=None, width=5, height=4, dpi=100):
-        fig, self.ax = plt.subplots(figsize=(width, height), dpi=dpi)
+        self.fig, self.ax = plt.subplots(figsize=(width, height), dpi=dpi)
 
-        super().__init__(fig)
+        super().__init__(self.fig)
         self.setParent(parent)
         self.df = df
         self.time_series = time_series
@@ -35,3 +35,4 @@ class Plot(FigureCanvasQTAgg):
                                 dt.timedelta(hours=2)).astype(dt.datetime)
             self.ax.set(xlabel='Time [HH:MM]', ylabel='Power [W]')
             plt.xticks(x_ticks, rotation=45)
+

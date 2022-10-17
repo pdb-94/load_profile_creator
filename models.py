@@ -60,6 +60,10 @@ class Department:
             self.load_profile[name + ' power [W]'] = self.room[i].load_profile[name + ' Total Load [W]']
         self.load_profile[self.name + ' Total Load [W]'] = self.load_profile.sum(axis=1)
 
+    def clear_load_profile(self):
+        for col in self.load_profile.columns:
+            col.drop()
+
 
 class Room:
     """
@@ -108,11 +112,12 @@ class Room:
             self.load_profile[name + ' power [W]'] = self.load[i].load_profile[name + ' power [W]']
         self.load_profile[self.name + ' Total Load [W]'] = self.load_profile.sum(axis=1)
 
+    def clear_load_profile(self):
+        for col in self.load_profile.columns:
+            col.drop()
+
 
 class Load:
-
-    # TODO: Create load profiles from data
-    #   - how to deal with profile (pd.Series with True/False)
 
     def __init__(self,
                  env=None,

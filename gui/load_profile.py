@@ -83,3 +83,10 @@ class Load_profile(QWidget):
         # Add Widgets to Layout
         self.layout.addWidget(self.plot, 6, 0, 1, 2)
         self.layout.addWidget(self.toolbar, 5, 0, 1, 2)
+
+    def clear_plot(self):
+        self.plot = Plot()
+        self.toolbar = NavigationToolbar(self.plot, self)
+        # Add Widgets to Layout
+        self.layout.addWidget(self.plot, 6, 0, 1, 2)
+        self.layout.addWidget(self.toolbar, 5, 0, 1, 2)
