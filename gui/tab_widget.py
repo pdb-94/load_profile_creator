@@ -773,6 +773,7 @@ class TabWidget(QWidget):
         load_index = tab.level_4_combo.currentIndex()
         load = self.env[0].department[dep_index].room[room_index].load[load_index]
         name = load.name
+        #
         tab.adjust_plot(time_series=self.env[0].time_series,
                         df=load.load_profile[name + ' power [W]'])
 

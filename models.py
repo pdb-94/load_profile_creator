@@ -114,9 +114,9 @@ class Load:
             self.off = self.data['off']
             self.t_start = dt.datetime.combine(self.env.time_series.iloc[0].date(), self.on)
             self.t_end = dt.datetime.combine(self.env.time_series.iloc[-1].date(), self.off)
-            self.cycle_length = self.data['cycle_length']
-            self.interval_open = self.data['interval_open']
-            self.interval_close = self.data['interval_close']
+            self.cycle_length = int(self.data['cycle_length'])
+            self.interval_open = int(self.data['interval_open'])
+            self.interval_close = int(self.data['interval_close'])
         elif self.load_type == 'cycle':
             self.cycle_length = self.data['cycle_length']
             self.cycle = pd.read_csv(self.data['cycle'])
@@ -203,7 +203,6 @@ class Load:
             index = self.load_profile.index
             # Check if Status is turned on
             if self.load_profile.loc[index[i], self.name + ' power [W]'] == True:
-                print(self.load_profile.loc[index[i], self.name + ' power [W]'])
                 # Check if cycle is longer than index
                 if i + cycle_length < len(index):
                     self.load_profile.loc[index[i]:index[i+cycle_length-1]] = self.cycle.values

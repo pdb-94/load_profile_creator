@@ -30,6 +30,12 @@ def convert_datetime(start: str, end: str, step: str):
 
     return t_start, t_end, t_step
 
+def check_empty_string(parameter):
+    if parameter != '':
+        return parameter
+    else:
+        return
+
 
 def convert_time(text: str):
     """

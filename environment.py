@@ -42,17 +42,9 @@ class Environment:
         :return: pd.DataFrame
             self.df
         """
-        if self.time_data is None:
-            date = dt.date.today()
-            start = dt.time(hour=0, minute=0)
-            end = dt.time(hour=23, minute=59)
-            step = dt.timedelta(minutes=1)
-            t_start = dt.datetime.combine(date, start)
-            t_end = dt.datetime.combine(date, end)
-        else:
-            t_start = self.time_data[0]
-            t_end = self.time_data[1]
-            step = self.time_data[2]
+        t_start = self.time_data[0]
+        t_end = self.time_data[1]
+        step = self.time_data[2]
         time = pd.date_range(start=t_start, end=t_end, freq=step)
         df = pd.Series(time)
 
