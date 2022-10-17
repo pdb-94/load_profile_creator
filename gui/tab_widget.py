@@ -562,28 +562,39 @@ class TabWidget(QWidget):
         :return: None
         """
         # root = sys.path[1]
-        root = 'C:/Users/Rummeny/PycharmProjects/hospital_load_model'
-        # Top Level
-        directory = '/load_profiles'
-        folder = root + directory
-        if not os.path.exists(folder):
-            os.makedirs(folder)
-        # Sub level
-        sub_directory = ['/hospital', '/department', '/room', '/consumer']
-        for sub_dir in sub_directory:
-            if not os.path.exists(folder + sub_dir):
-                os.makedirs(folder + sub_dir)
-        self.export_data(load=self.env[0],
-                         path=root + directory + sub_directory[0])
-        for i in range(len(self.env[0].department)):
-            self.export_data(load=self.env[0].department[i],
-                             path=root + directory + sub_directory[1])
-            for k in range(len(self.env[0].department[i].room)):
-                self.export_data(load=self.env[0].department[i].room[k],
-                                 path=root + directory + sub_directory[2])
-                for j in range(len(self.env[0].department[i].room[k].load)):
-                    self.export_data(load=self.env[0].department[i].room[k].load[j],
-                                     path=root + directory + sub_directory[3])
+        root = 'C:/Users/Rummeny/PycharmProjects/hospital_load_model'  # TODO: Remove Statement
+        env = self.env[0]
+        # Hospital directory
+        hospital_directory = '/' + str(env.name + '_load_profile')
+        directory = root + hospital_directory
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        # Export environment load profile
+        self.export_data(load=env, path=directory)
+        for i in range(len(env.department)):
+            dep = env.department[i]
+            dep_dir = '/' + dep.name + '_load_profile'
+            directory = root + hospital_directory + dep_dir
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+            # Export department load profile
+            self.export_data(load=dep, path=directory)
+            for k in range(len(dep.room)):
+                room = dep.room[k]
+                room_dir = '/' + room.name + '_load_profile'
+                directory = root + hospital_directory + dep_dir + room_dir
+                if not os.path.exists(directory):
+                    os.makedirs(directory)
+                # Export room load profile
+                self.export_data(load=room, path=directory)
+                for j in range(len(room.load)):
+                    load = room.load[j]
+                    load_dir = '/' + load.name + '_load_profile'
+                    directory = root + hospital_directory + dep_dir + room_dir + load_dir
+                    if not os.path.exists(directory):
+                        os.makedirs(directory)
+                    # Export load load profile
+                    self.export_data(load=load, path=directory)
 
     def export_data(self, load=None, path: str = None):
         """
