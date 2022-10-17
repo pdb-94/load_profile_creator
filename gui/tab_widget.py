@@ -100,6 +100,7 @@ class TabWidget(QWidget):
         tab(4).department_combo.currentIndexChanged.connect(self.add_room_combo)
         tab(4).room_combo.currentIndexChanged.connect(self.add_consumer_combo)
         tab(5).level_1_combo.currentIndexChanged.connect(self.change_load_profile)
+        tab(5).level_1_combo.currentIndexChanged.connect(self.build_load_profiles)
         tab(5).level_2_combo.currentIndexChanged.connect(self.department_load_profile)
         tab(5).level_3_combo.currentIndexChanged.connect(self.room_load_profile)
         tab(5).level_4_combo.currentIndexChanged.connect(self.consumer_load_profile)
@@ -692,8 +693,9 @@ class TabWidget(QWidget):
             if level == 0:
                 # Hospital
                 # Show hospital load profile
+                name = self.env[0].name
                 tab.adjust_plot(time_series=self.env[0].time_series,
-                                df=self.env[0].load_profile['Total Load [W]'])
+                                df=self.env[0].load_profile[name + ' Total Load [W]'])
             elif level == 1:
                 # Show, enable and add department names to level_2_combo
                 gui_func.clear_widget(widget=[tab.level_2_combo])
@@ -728,15 +730,6 @@ class TabWidget(QWidget):
         if tab.level_1_combo.currentIndex() == 1:
             tab.adjust_plot(time_series=self.env[0].time_series,
                             df=dep.load_profile[name + ' Total Load [W]'])
-            # Summarize department load_profile
-            # dep.load_profile[name + ' Total Load [W]'] = np.nan
-            # for i in range(len(dep.room)):
-            #     room_name = dep.room_names[i]
-            #     dep.load_profile[room_name + ' power [W]'] = dep.room[i].load_profile[room_name+ ' Total Load [W]']
-            # dep.load_profile[name + ' Total Load [W]'] = dep.load_profile.sum(axis=1)
-            # # for room in dep.room:
-            # #     room_name = dep.room_names[room]
-            # #     dep.load_profile[room_name + ' power [W]'] = dep.room
         else:
             gui_func.clear_widget(widget=[tab.level_3_combo])
             tab.department = dep.room_names
@@ -773,40 +766,26 @@ class TabWidget(QWidget):
         load_index = tab.level_4_combo.currentIndex()
         load = self.env[0].department[dep_index].room[room_index].load[load_index]
         name = load.name
-        #
         tab.adjust_plot(time_series=self.env[0].time_series,
                         df=load.load_profile[name + ' power [W]'])
 
     def build_load_profiles(self):
         """
-        Summarize load profiles
+        Call functions to summarize load profiles
         :return: None
         """
         if isinstance(self.env[0], Environment):
             env = self.env[0]
-            if len(env.department) > 0:
-                for i in range(len(env.department)):
-                    dep = env.department[i]
-                    if len(dep.room) > 0:
-                        for k in range(len(dep.room)):
-                            room = dep.room[k]
-                            if len(room.load) > 0:
-                                for j in range(len(room.load)):
-                                    load = room.load[j]
-                                    room.load_profile[load.name + ' power [W]'] = load.load_profile[
-                                        load.name + ' power [W]']
-                                    print(room.load_profile[load.name + ' power [W]'])
-                            room.load_profile[room.name + ' Total Power [W]'] = np.nan
-                            room.load_profile[room.name + ' Total Power [W]'] = room.load_profile.sum(axis=1)
-                            dep.load_profile[room.name + ' Total Power [W]'] = room.load_profile[
-                                room.name + ' Total Power [W]']
-                            print(dep.load_profile[room.name + ' Total Power [W]'])
-                    dep.load_profile[dep.name + ' Total Power [W]'] = np.nan
-                    dep.load_profile[dep.name + ' Total Power [W]'] = dep.load_profile.sum(axis=1)
-                    env.load_profile[dep.name + ' Total Power [W]'] = dep.load_profile[dep.name + ' Total Power [W]']
-                    print(env.load_profile[dep.name + ' Total Power [W]'])
-            env.load_profile[env.name + ' Total Power [W]'] = np.nan
-            env.load_profile[env.name + ' Total Power [W]'] = env.load_profile.sum(axis=1)
+            for i in range(len(env.department)):
+                dep = env.department[i]
+                for k in range(len(dep.room)):
+                    room = dep.room[k]
+                    # Summarize room profile
+                    room.summarize_load_profile()
+                # Summarize department profile
+                dep.summarize_load_profile()
+            # Summarize hospital profile
+            env.summarize_load_profile()
 
 
 if __name__ == '__main__':

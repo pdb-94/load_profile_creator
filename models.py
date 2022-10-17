@@ -49,6 +49,17 @@ class Department:
         self.room.append(Room(env=self.env, name=name, t_start=t_start, t_end=t_end))
         self.room_names.append(name)
 
+    def summarize_load_profile(self):
+        """
+        Calculate total power [W]
+        :return: None
+        """
+        self.load_profile[self.name + ' Total Load [W]'] = np.nan
+        for i in range(len(self.room)):
+            name = self.room[i].name
+            self.load_profile[name + ' power [W]'] = self.room[i].load_profile[name + ' Total Load [W]']
+        self.load_profile[self.name + ' Total Load [W]'] = self.load_profile.sum(axis=1)
+
 
 class Room:
     """
@@ -69,7 +80,7 @@ class Room:
         self.load_names = []
 
         self.time_series = self.env.time_series
-        columns = [name + ' Total Load [W]']
+        columns = [self.name + ' Total Load [W]']
         self.load_profile = pd.DataFrame(index=self.time_series, columns=columns)
 
     def create_load(self, name: str, data: dict):
@@ -85,7 +96,17 @@ class Room:
                               name=name,
                               data=data))
         self.load_names.append(name)
-        # self.load_profile[name + ' power [W]'] = self.load[-1].load_profile[name + ' power [W]']
+
+    def summarize_load_profile(self):
+        """
+        Calculate total power [W]
+        :return: None
+        """
+        self.load_profile[self.name + ' Total Load [W]'] = np.nan
+        for i in range(len(self.load)):
+            name = self.load[i].name
+            self.load_profile[name + ' power [W]'] = self.load[i].load_profile[name + ' power [W]']
+        self.load_profile[self.name + ' Total Load [W]'] = self.load_profile.sum(axis=1)
 
 
 class Load:

@@ -8,6 +8,7 @@ Module including class Environment
 import os
 import pandas as pd
 import datetime as dt
+import numpy as np
 # LPC Libraries
 import models as md
 
@@ -28,12 +29,10 @@ class Environment:
         self.standard_room = []
         # Create time series and load DataFrame
         self.time_series = self.create_df()
-        columns = ['Total Load [W]']
+        columns = [self.name + ' Total Load [W]']
         self.load_profile = pd.DataFrame(index=self.time_series, columns=columns)
-        self.load_profile[name + ' Total Load [W]'] = 100  # TODO: delete Statement
         # DataBase
         self.database = self.import_database()
-
         self.import_standard_room()
 
     def create_df(self):
@@ -60,6 +59,17 @@ class Environment:
         """
         self.department.append(md.Department(env=self, name=name, t_start=t_start, t_end=t_end))
         self.department_names.append(name)
+
+    def summarize_load_profile(self):
+        """
+        Calculate total power [W]
+        :return: None
+        """
+        self.load_profile[self.name + ' Total Load [W]'] = np.nan
+        for i in range(len(self.department)):
+            name = self.department[i].name
+            self.load_profile[name + ' power [W]'] = self.department[i].load_profile[name + ' Total Load [W]']
+        self.load_profile[self.name + ' Total Load [W]'] = self.load_profile.sum(axis=1)
 
     def import_database(self):
         """
