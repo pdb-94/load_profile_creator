@@ -10,25 +10,25 @@ Funding and Project-Association: The development of this Tool library at the TH 
 
 Content and Structure:
     
-    environment: 
+   environment: 
     
-    models: 
+   models: 
     
-    gui: a graphical user interface for user-friendly control and test of the LPC library
+   gui: a graphical user interface for user-friendly control and test of the LPC library
 
 Dependencies:
 
-matplotlib
+   matplotlib
 
-numpy
+   numpy
 
-pandas
+   pandas
 
-PyQt5
+   PyQt5
 
 Direct contributors to this repository:
     
-    Paul Bohn, Technische Hochschule Köln
+   Paul Bohn, Technische Hochschule Köln
     
-    Moritz End, Technische Hochschule Köln
+   Moritz End, Technische Hochschule Köln
     
