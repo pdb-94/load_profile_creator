@@ -29,9 +29,6 @@ from environment import Environment
 import models as md
 
 
-# TODO: Create function create_directory
-
-
 class TabWidget(QWidget):
     """
     Class to create the main Window Frame of the LPC GUI
@@ -192,7 +189,7 @@ class TabWidget(QWidget):
                         pass
                     else:
                         # Add selected items to ComboBox
-                        gui_func.add_combo(widget=tab.room_combo, name=self.env[0].department[0].room_names)
+                        gui_func.add_combo(widget=tab.room_combo, name=self.env[0].room[0].load_names)
         elif index == 5:
             # Tab Load profile
             tab = self.tabs.widget(index)
@@ -315,9 +312,8 @@ class TabWidget(QWidget):
         :return: None
         """
         tab = self.tabs.widget(3)
-        # Name
+        # Parameters
         name = tab.name_edit.text()
-        # Time data
         start_str = tab.start_time_edit.text()
         end_str = tab.end_time_edit.text()
         start = gui_func.convert_time(text=start_str)
@@ -413,83 +409,133 @@ class TabWidget(QWidget):
         :return: None
         """
         tab = self.tabs.widget(4)
+        # Basic parameters
         dep_index = tab.department_combo.currentIndex()
         room_index = tab.room_combo.currentIndex()
-        # Basic parameters (name, power, standby)
+        load_type = str(tab.type_combo.currentText())
+        load_type = load_type.lower()
+        # Build dictionary with load parameters and clear widget
+        if load_type == 'constant':
+            # Constant load
+            data = self.create_constant_load_data(dep_index=dep_index, room_index=room_index)
+        elif load_type == 'sequential':
+            # Sequential load
+            data = self.create_sequential_load_data(dep_index=dep_index, room_index=room_index)
+        elif load_type == 'cycle':
+            data = self.create_cycle_load_data()
+        if data is None:
+            return
+        # Create Load object in selected Department & Room in Environment
+        self.env[0].department[dep_index].room[room_index].create_load(name=data['name'],
+                                                                       data=data)
+        # Run gui function (add load to viewer, change ComoboBox Index, clear widgets)
+        gui_func.add_to_viewer(widget=tab, item=[data['name']])
+        gui_func.change_combo_index(combo=[tab.type_combo])
+        gui_func.clear_widget(widget=[tab.name_edit, tab.power_edit, tab.standby_edit,
+                                      tab.cycle_length_edit, tab.cycle_edit, tab.profile_edit,
+                                      tab.interval_open_edit, tab.interval_closed_edit])
+
+    def create_constant_load_data(self, dep_index: int, room_index: int):
+        """
+        :param dep_index: int
+            index of selected department
+        :param room_index: int
+            index of selected room
+        :return: dict
+            load data
+        """
+        tab = self.tabs.widget(4)
         name = tab.name_edit.text()
         load_type = str(tab.type_combo.currentText())
         load_type = load_type.lower()
         power = tab.power_edit.text()
         standby = tab.standby_edit.text()
-        # Build dictionary with load parameters and clear widget
-        if load_type == 'constant':
-            # Constant load
-            on = self.env[0].department[dep_index].room[room_index].t_start
-            off = self.env[0].department[dep_index].room[room_index].t_end
-            data = {'load_type': load_type, 'power [W]': power, 'standby [W]': standby, 'on': on, 'off': off}
-            gui_func.clear_widget(widget=[tab.name_edit, tab.power_edit, tab.standby_edit])
-        elif load_type == 'sequential':
-            # Sequential load
-            on = self.env[0].department[dep_index].room[room_index].t_start
-            off = self.env[0].department[dep_index].room[room_index].t_end
-            cycle_length = tab.cycle_length_edit.text()
-            interval_open = tab.interval_open_edit.text()
-            interval_closed = tab.interval_closed_edit.text()
-            if cycle_length == '':
-                print('Please type in cycle length [min]')
-                return
-            else:
-                cycle_length = int(cycle_length)
-            if interval_open == '':
-                print('Please type in interval (open) [min]')
-                return
-            else:
-                interval_open = int(interval_open)
-            if interval_closed == '':
-                print('Please type in interval (closed) [min]')
-                return
-            else:
-                interval_closed = int(interval_closed)
-            data = {'load_type': load_type, 'power [W]': power, 'standby [W]': standby, 'cycle_length': cycle_length,
-                    'interval_open': interval_open, 'interval_close': interval_closed, 'on': on, 'off': off}
-            gui_func.clear_widget(widget=[tab.name_edit, tab.power_edit, tab.standby_edit,
-                                          tab.cycle_length_edit, tab.interval_open_edit, tab.interval_closed_edit])
-        elif load_type == 'cycle':
-            cycle_length = tab.cycle_length_edit.text()
-            cycle = tab.cycle_edit.text()
-            profile = tab.profile_edit.text()
-            if cycle_length == '':
-                print('Please put in cycle length [min]')
-                return
-            else:
-                cycle_length = int(cycle_length)
-            if os.path.exists(cycle):
-                pass
-            else:
-                print('File cycle: ' + str(cycle) + ' does not exist.')
-                gui_func.clear_widget(widget=[tab.name_edit, tab.power_edit, tab.standby_edit,
-                                              tab.cycle_length_edit, tab.cycle_edit, tab.profile_edit])
-                return
-            if os.path.exists(profile):
-                pass
-            else:
-                print('File cycle: ' + str(profile) + ' does not exist.')
-                gui_func.clear_widget(widget=[tab.name_edit, tab.power_edit, tab.standby_edit,
-                                              tab.cycle_length_edit, tab.cycle_edit, tab.profile_edit])
-                return
+        on = self.env[0].department[dep_index].room[room_index].t_start
+        off = self.env[0].department[dep_index].room[room_index].t_end
+        data = {'name': name, 'load_type': load_type, 'power [W]': power, 'standby [W]': standby, 'on': on, 'off': off}
 
-            data = {'load_type': load_type, 'power [W]': power, 'standby [W]': standby, 'cycle_length': cycle_length,
-                    'profile': profile, 'cycle': cycle}
+        return data
+
+    def create_sequential_load_data(self, dep_index: int, room_index: int):
+        """
+        :param dep_index: int
+            index of selected department
+        :param room_index: int
+            index of selected room
+        :return: dict
+            load data
+        """
+        tab = self.tabs.widget(4)
+        name = tab.name_edit.text()
+        load_type = str(tab.type_combo.currentText())
+        load_type = load_type.lower()
+        power = tab.power_edit.text()
+        standby = tab.standby_edit.text()
+        on = self.env[0].department[dep_index].room[room_index].t_start
+        off = self.env[0].department[dep_index].room[room_index].t_end
+        cycle_length = tab.cycle_length_edit.text()
+        interval_open = tab.interval_open_edit.text()
+        interval_closed = tab.interval_closed_edit.text()
+        if cycle_length == '':
+            print('Please type in cycle length [min].')
+            return
+        else:
+            cycle_length = int(cycle_length)
+        if interval_open == '':
+            print('Please type in interval (open) [min].')
+            return
+        else:
+            interval_open = int(interval_open)
+        if interval_closed == '':
+            print('Please type in interval (closed) [min].')
+            return
+        else:
+            interval_closed = int(interval_closed)
+        data = {'name': name, 'load_type': load_type, 'power [W]': power, 'standby [W]': standby,
+                'cycle_length': cycle_length,
+                'interval_open': interval_open, 'interval_close': interval_closed, 'on': on, 'off': off}
+
+        return data
+
+    def create_cycle_load_data(self):
+        """
+        :return: dict
+            load data
+        """
+        tab = self.tabs.widget(4)
+        name = tab.name_edit.text()
+        load_type = str(tab.type_combo.currentText())
+        load_type = load_type.lower()
+        power = tab.power_edit.text()
+        standby = tab.standby_edit.text()
+        cycle_length = tab.cycle_length_edit.text()
+        cycle = tab.cycle_edit.text()
+        profile = tab.profile_edit.text()
+        if cycle_length == '':
+            print('Please type in cycle length [min].')
+            return
+        else:
+            cycle_length = int(cycle_length)
+        if os.path.exists(cycle):
+            pass
+        else:
+            print('File cycle: ' + str(cycle) + ' does not exist.')
             gui_func.clear_widget(widget=[tab.name_edit, tab.power_edit, tab.standby_edit,
                                           tab.cycle_length_edit, tab.cycle_edit, tab.profile_edit])
+            return
+        if os.path.exists(profile):
+            pass
+        else:
+            print('File cycle: ' + str(profile) + ' does not exist.')
+            gui_func.clear_widget(widget=[tab.name_edit, tab.power_edit, tab.standby_edit,
+                                          tab.cycle_length_edit, tab.cycle_edit, tab.profile_edit])
+            return
 
-        # Create Load object in selected Department & Room in Environment
-        self.env[0].department[dep_index].room[room_index].create_load(name=name,
-                                                                       data=data)
-        # Add name to viewer
-        gui_func.add_to_viewer(widget=tab, item=[name])
-        # Clear User Inputs
-        gui_func.change_combo_index(combo=[tab.type_combo])
+        data = {'name': name, 'load_type': load_type, 'power [W]': power, 'standby [W]': standby,
+                'cycle_length': cycle_length,
+                'profile': profile, 'cycle': cycle}
+
+        return data
 
     def create_directory(self):
         """
@@ -506,10 +552,10 @@ class TabWidget(QWidget):
         # Sub level
         sub_directory = ['/hospital', '/department', '/room', '/consumer']
         for sub_dir in sub_directory:
-            if not os.path.exists(folder+sub_dir):
-                os.makedirs(folder+sub_dir)
+            if not os.path.exists(folder + sub_dir):
+                os.makedirs(folder + sub_dir)
         self.export_data(load=self.env[0],
-                         path=root+directory+sub_directory[0])
+                         path=root + directory + sub_directory[0])
         for i in range(len(self.env[0].department)):
             self.export_data(load=self.env[0].department[i],
                              path=root + directory + sub_directory[1])
@@ -560,7 +606,6 @@ class TabWidget(QWidget):
                 self.env[0].department_names.pop(item_index)
                 gui_func.delete_from_combo(combo=tab(3).department_combo, index=item_index)
                 gui_func.delete_from_combo(combo=tab(4).department_combo, index=item_index)
-                tab(5).department.pop(item_index)
             elif index == 3:
                 # Tab Room: Delete Item based on selected department in dep_combo and room_viewer
                 gui_func.delete_from_viewer(widget=tab(index), item=item_index)
@@ -694,8 +739,8 @@ class TabWidget(QWidget):
             # #     dep.load_profile[room_name + ' power [W]'] = dep.room
         else:
             gui_func.clear_widget(widget=[tab.level_3_combo])
-            tab.room = dep.room_names
-            gui_func.add_combo(widget=tab.level_3_combo, name=tab.room)
+            tab.department = dep.room_names
+            gui_func.add_combo(widget=tab.level_3_combo, name=tab.department)
 
     def room_load_profile(self):
         """
@@ -708,8 +753,8 @@ class TabWidget(QWidget):
         room = self.env[0].department[dep_index].room[room_index]
         name = room.name
         if tab.level_1_combo.currentIndex() == 2:
-            # room.load_profile[name + ' Total Load [W]'] = np.nan
-            # room.load_profile[name + ' Total Load [W]'] = room.load_profile.sum(axis=1)
+            room.load_profile[name + ' Total Load [W]'] = np.nan
+            room.load_profile[name + ' Total Load [W]'] = room.load_profile.sum(axis=1)
             tab.adjust_plot(time_series=self.env[0].time_series,
                             df=room.load_profile[name + ' Total Load [W]'])
         else:
@@ -733,10 +778,9 @@ class TabWidget(QWidget):
 
     def build_load_profiles(self):
         """
-
+        Summarize load profiles
         :return: None
         """
-
         if isinstance(self.env[0], Environment):
             env = self.env[0]
             if len(env.department) > 0:
@@ -748,11 +792,13 @@ class TabWidget(QWidget):
                             if len(room.load) > 0:
                                 for j in range(len(room.load)):
                                     load = room.load[j]
-                                    room.load_profile[load.name + ' power [W]'] = load.load_profile[load.name + ' power [W]']
+                                    room.load_profile[load.name + ' power [W]'] = load.load_profile[
+                                        load.name + ' power [W]']
                                     print(room.load_profile[load.name + ' power [W]'])
                             room.load_profile[room.name + ' Total Power [W]'] = np.nan
                             room.load_profile[room.name + ' Total Power [W]'] = room.load_profile.sum(axis=1)
-                            dep.load_profile[room.name + ' Total Power [W]'] = room.load_profile[room.name + ' Total Power [W]']
+                            dep.load_profile[room.name + ' Total Power [W]'] = room.load_profile[
+                                room.name + ' Total Power [W]']
                             print(dep.load_profile[room.name + ' Total Power [W]'])
                     dep.load_profile[dep.name + ' Total Power [W]'] = np.nan
                     dep.load_profile[dep.name + ' Total Power [W]'] = dep.load_profile.sum(axis=1)
