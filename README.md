@@ -14,10 +14,10 @@ Content and Structure:
     gui: a graphical user interface for user-friendly control and test of the LPC library
 
 Dependencies:
-    matplotlib
-    numpy
-    pandas
-    PyQt5
+matplotlib
+numpy
+pandas
+PyQt5
 
 Direct contributors to this repository:
     Paul Bohn, Technische Hochschule Köln
