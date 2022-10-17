@@ -105,6 +105,7 @@ class TabWidget(QWidget):
         tab(5).level_3_combo.currentIndexChanged.connect(self.room_load_profile)
         tab(5).level_4_combo.currentIndexChanged.connect(self.consumer_load_profile)
 
+    # Button Functions
     def next_tab(self):
         """
         Show next tab
@@ -236,6 +237,7 @@ class TabWidget(QWidget):
             else:
                 self.create_load()
 
+    # Create Hospital
     def create_env(self):
         """
         Create Environment from User Input in hospital tab
@@ -264,6 +266,7 @@ class TabWidget(QWidget):
             gui_func.enable_widget(widget=[self.next_btn], enable=True)
             gui_func.enable_widget(widget=[self.tabs.widget(2), self.tabs.widget(5)], enable=True)
 
+    # Create Department
     def create_department(self):
         """
         Get parameters and run create_department from Environment obj
@@ -290,6 +293,7 @@ class TabWidget(QWidget):
         gui_func.clear_widget(widget=[tab(2).name_edit])
         gui_func.enable_widget(widget=[self.tabs.widget(3)], enable=True)
 
+    # Create Room
     def create_room(self):
         """
         Run function individual/standard room based on selection in room type combobox
@@ -365,45 +369,9 @@ class TabWidget(QWidget):
         gui_func.clear_widget(widget=[tab.name_edit])
         gui_func.enable_widget(widget=[self.tabs.widget(4)], enable=True)
         # Create Loads in Standard room
-        # Get load data
-        load = list(standard_room['device'])
-        load_quantity = list(standard_room['quantity'])
-        # Create load objects from standard room
-        for i in range(len(load)):
-            load_type = standard_room.loc[i, 'type']
-            power = standard_room.loc[i, 'power [W]']
-            standby = standard_room.loc[i, 'standby [W]']
-            cycle_length = standard_room.loc[i, 'cycle length']
-            interval_open = standard_room.loc[i, 'interval (open)']
-            interval_close = standard_room.loc[i, 'interval (closed)']
-            on = self.env[0].department[dep_index].t_start
-            off = self.env[0].department[dep_index].t_end
-            if load_type == 'constant':
-                data = {'load_type': load_type, 'power [W]': power, 'standby [W]': standby, 'on': on, 'off': off}
-            elif load_type == 'sequential':
-                data = {'load_type': load_type, 'power [W]': power, 'standby [W]': standby,
-                        'cycle_length': cycle_length, 'interval_open': interval_open,
-                        'interval_close': interval_close, 'on': on, 'off': off}
-            else:
-                cycle = root + '/data/load/profile/' + load[i] + '_cycle.csv.'
-                profile = root + '/data/load/cycle/' + load[i] + '_profile/csv.'
-                data = {'load_type': load_type, 'power [W]': power, 'standby [W]': standby,
-                        'cycle_length': cycle_length,
-                        'profile': profile, 'cycle': cycle}
-            for k in range(load_quantity[i]):
-                if load_quantity[i] == 1:
-                    load_name = load[i]
-                else:
-                    load_name = load[i] + ' ' + str(k + 1)
-                room = self.env[0].department[dep_index].room[-1]
-                # Create load object in room.load
-                room.load.append(md.Load(env=self.env[0],
-                                         name=load_name,
-                                         data=data))
-                room.load_names.append(load_name)
-                # Create columns for load in room load profile
-                room.load_profile[load_name + ' power [W]'] = room.load[-1].load_profile[load_name + ' power [W]']
+        self.create_standard_room_load(dep_index=dep_index, root=root, standard_room=standard_room)
 
+    # Create Load
     def create_load(self):
         """
         Get room parameters and create Load object in selected Department/Room
@@ -435,6 +403,55 @@ class TabWidget(QWidget):
         gui_func.clear_widget(widget=[tab.name_edit, tab.power_edit, tab.standby_edit,
                                       tab.cycle_length_edit, tab.cycle_edit, tab.profile_edit,
                                       tab.interval_open_edit, tab.interval_closed_edit])
+
+    def create_standard_room_load(self, dep_index: int, root: str, standard_room: pd.DataFrame):
+        """
+        Create load objects in standard room
+        :param dep_index: int
+            department index
+        :param root: str
+            path of directory
+        :param standard_room: pd.DataFrame
+            csv-file of selected standard room
+        :return: None
+        """
+        # Get load name and quantity from standard room
+        load = list(standard_room['device'])
+        load_quantity = list(standard_room['quantity'])
+        for i in range(len(load)):
+            load_type = standard_room.loc[i, 'type']
+            power = standard_room.loc[i, 'power [W]']
+            standby = standard_room.loc[i, 'standby [W]']
+            cycle_length = standard_room.loc[i, 'cycle length']
+            interval_open = standard_room.loc[i, 'interval (open)']
+            interval_close = standard_room.loc[i, 'interval (closed)']
+            on = self.env[0].department[dep_index].t_start
+            off = self.env[0].department[dep_index].t_end
+            # Build data dictionary depending on load_type
+            if load_type == 'constant':
+                data = {'load_type': load_type, 'power [W]': power, 'standby [W]': standby, 'on': on, 'off': off}
+            elif load_type == 'sequential':
+                data = {'load_type': load_type, 'power [W]': power, 'standby [W]': standby,
+                        'cycle_length': cycle_length, 'interval_open': interval_open,
+                        'interval_close': interval_close, 'on': on, 'off': off}
+            else:
+                cycle = root + '/data/load/profile/' + load[i] + '_cycle.csv.'
+                profile = root + '/data/load/cycle/' + load[i] + '_profile/csv.'
+                data = {'load_type': load_type, 'power [W]': power, 'standby [W]': standby,
+                        'cycle_length': cycle_length,
+                        'profile': profile, 'cycle': cycle}
+            # Rename loads if quantity > 1
+            for k in range(load_quantity[i]):
+                if load_quantity[i] == 1:
+                    load_name = load[i]
+                else:
+                    load_name = load[i] + ' ' + str(k + 1)
+                room = self.env[0].department[dep_index].room[-1]
+                # Create load object in room.load
+                room.load.append(md.Load(env=self.env[0],
+                                         name=load_name,
+                                         data=data))
+                room.load_names.append(load_name)
 
     def create_constant_load_data(self, dep_index: int, room_index: int):
         """
@@ -538,6 +555,7 @@ class TabWidget(QWidget):
 
         return data
 
+    # Export data
     def create_directory(self):
         """
         Create export directory
@@ -578,6 +596,7 @@ class TabWidget(QWidget):
         """
         load.load_profile.to_csv(path + '/' + load.name + '.csv', sep=';', decimal=',')
 
+    # Delete objects
     def delete(self):
         """
         Delete Objects from env an display Widgets
@@ -630,6 +649,7 @@ class TabWidget(QWidget):
                 room.load_names.pop(load_index)
                 room.load_profile = room.load_profile.drop([name + ' power [W]'], axis=1)
 
+    # Add to ComboBoxes
     def add_room_combo(self):
         """
         Show rooms in ComboBox/Viewer based on selected department
@@ -673,6 +693,7 @@ class TabWidget(QWidget):
                 consumer_names = self.env[0].department[dep_index].room[room_index].load_names
                 gui_func.add_to_viewer(widget=tab, item=consumer_names)
 
+    # Summarize and plot load profiles
     def change_load_profile(self):
         """
         Change load profile level in tab load_profile
