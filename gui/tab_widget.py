@@ -424,21 +424,22 @@ class TabWidget(QWidget):
             cycle_length = standard_room.loc[i, 'cycle length']
             interval_open = standard_room.loc[i, 'interval (open)']
             interval_close = standard_room.loc[i, 'interval (closed)']
+            operating_hour = standard_room.loc[i, 'operating hour']
             on = self.env[0].department[dep_index].t_start
             off = self.env[0].department[dep_index].t_end
             # Build data dictionary depending on load_type
             if load_type == 'constant':
-                data = {'load_type': load_type, 'power [W]': power, 'standby [W]': standby, 'on': on, 'off': off}
+                data = {'load_type': load_type, 'power [W]': power, 'standby [W]': standby, 'on': on, 'off': off,
+                        'room': 'standard', 'operating_hour': operating_hour}
             elif load_type == 'sequential':
                 data = {'load_type': load_type, 'power [W]': power, 'standby [W]': standby,
                         'cycle_length': cycle_length, 'interval_open': interval_open,
-                        'interval_close': interval_close, 'on': on, 'off': off}
+                        'interval_close': interval_close, 'on': on, 'off': off, 'room': 'standard'}
             else:
                 cycle = root + '/data/load/' + load[i].lower() + '_cycle.csv'
                 profile = root + '/data/load/' + load[i].lower() + '_profile.csv'
                 data = {'load_type': load_type, 'power [W]': power, 'standby [W]': standby,
-                        'cycle_length': cycle_length,
-                        'profile': profile, 'cycle': cycle}
+                        'cycle_length': cycle_length, 'profile': profile, 'cycle': cycle, 'room': 'standard'}
             # Rename loads if quantity > 1
             for k in range(load_quantity[i]):
                 if load_quantity[i] == 1:
@@ -696,11 +697,14 @@ class TabWidget(QWidget):
         tab = self.tabs.widget(4)
         gui_func.clear_widget(widget=[tab.viewer])
         dep_index = tab.department_combo.currentIndex()
-        if len(self.env[0].department[dep_index].room) > 0:
-            room_index = tab.room_combo.currentIndex()
-            if len(self.env[0].department[dep_index].room[room_index].load) > 0:
-                consumer_names = self.env[0].department[dep_index].room[room_index].load_names
-                gui_func.add_to_viewer(widget=tab, item=consumer_names)
+        if len(self.env[0].department) == 0:
+            gui_func.add_to_viewer(widget=tab, item=[])
+        else:
+            if len(self.env[0].department[dep_index].room) > 0:
+                room_index = tab.room_combo.currentIndex()
+                if len(self.env[0].department[dep_index].room[room_index].load) > 0:
+                    consumer_names = self.env[0].department[dep_index].room[room_index].load_names
+                    gui_func.add_to_viewer(widget=tab, item=consumer_names)
 
     # Summarize and plot load profiles
     def change_load_profile(self):
@@ -815,10 +819,17 @@ class TabWidget(QWidget):
         Call functions to summarize load profiles
         :return: None
         """
+        tab = self.tabs.widget(5)
         if isinstance(self.env[0], Environment):
             env = self.env[0]
+            if len(env.department) == 0:
+                tab.clear_plot()
+                return
             for i in range(len(env.department)):
                 dep = env.department[i]
+                if len(dep.room) == 0:
+                    tab.clear_plot()
+                    return
                 for k in range(len(dep.room)):
                     room = dep.room[k]
                     # Summarize room profile
