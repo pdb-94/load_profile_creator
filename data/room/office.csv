@@ -1,8 +1,8 @@
-﻿quantity;device;manufacturer;model;group;priority;type;power [W];standby [W];cycle length;interval (open);interval (closed);source
-1;Air Condition (1.8 kW);Bruhm;;Technical;B;sequential;1800;0;10;25;25;"Fraunhofer UMSICHT Hospital Engineering - Teilprojekt ""Energieeffizienz"""
-2;Computer;;;Office;C;constant;135;0;;;;
-2;Monitor;;;Office;C;constant;50;0;;;;
-1;Printer;;;Office;C;cycle;300;0;1;0;0;
-2;Light;;;Lighting;C;constant;20;0;;;;
-2;Lamp;;;Lighting;C;constant;20;0;;;;
-1;Ceiling Fan;;;Technical;C;constant;60;0;;;;
+﻿quantity;device;manufacturer;model;group;priority;type;room;power [W];standby [W];cycle length;interval (open);interval (closed);operating hour;source
+1;Air Condition (1.8 kW);Bruhm;;Technical;B;sequential;standard;1800;0;10;25;25;True;"Fraunhofer UMSICHT Hospital Engineering - Teilprojekt ""Energieeffizienz"""
+2;Computer;;;Office;C;constant;standard;135;0;;;;True;EnerSHelF measuered data
+2;Monitor;;;Office;C;constant;standard;50;0;;;;True;EnerSHelF measuered data
+1;Printer;;;Office;C;cycle;standard;300;0;1;0;0;True;Assumption
+2;Light;;;Lighting;C;constant;standard;20;0;;;;True;EnerSHelF measuered data
+2;Lamp;;;Lighting;C;constant;standard;20;0;;;;True;EnerSHelF measuered data
+1;Ceiling Fan;;;Technical;C;constant;standard;60;0;;;;True;EnerSHelF measuered data
