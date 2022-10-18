@@ -434,8 +434,8 @@ class TabWidget(QWidget):
                         'cycle_length': cycle_length, 'interval_open': interval_open,
                         'interval_close': interval_close, 'on': on, 'off': off}
             else:
-                cycle = root + '/data/load/profile/' + load[i] + '_cycle.csv.'
-                profile = root + '/data/load/cycle/' + load[i] + '_profile/csv.'
+                cycle = root + '/data/load/' + load[i].lower() + '_cycle.csv'
+                profile = root + '/data/load/' + load[i].lower() + '_profile.csv'
                 data = {'load_type': load_type, 'power [W]': power, 'standby [W]': standby,
                         'cycle_length': cycle_length,
                         'profile': profile, 'cycle': cycle}
@@ -632,32 +632,31 @@ class TabWidget(QWidget):
             elif index == 2:
                 # Tab Department: Delete Item based on selected department in department_viewer
                 gui_func.delete_from_viewer(widget=self.tabs.widget(index), item=item_index)
-                self.env[0].department.pop(item_index)
-                self.env[0].department_names.pop(item_index)
+                dep = self.env[0].department[item_index]
+                name = self.env[0].department_names[item_index]
+                self.env[0].department.remove(dep)
+                self.env[0].department_names.remove(name)
                 gui_func.delete_from_combo(combo=tab(3).department_combo, index=item_index)
                 gui_func.delete_from_combo(combo=tab(4).department_combo, index=item_index)
             elif index == 3:
                 # Tab Room: Delete Item based on selected department in dep_combo and room_viewer
                 gui_func.delete_from_viewer(widget=tab(index), item=item_index)
                 dep_index = tab(index).department_combo.currentIndex()
-                room_index = tab(index).viewer.currentRow()
                 gui_func.delete_from_combo(combo=tab(4).room_combo, index=item_index)
-                self.env[0].department[dep_index].room.pop(room_index)
-                self.env[0].department[dep_index].room_names.pop(room_index)
+                room = self.env[0].department[dep_index].room[item_index]
+                name = self.env[0].department[dep_index].room_names[item_index]
+                self.env[0].department[dep_index].room.remove(room)
+                self.env[0].department[dep_index].room_names.remove(name)
             elif index == 4:
                 # Tab Consumer
                 gui_func.delete_from_viewer(widget=tab(index), item=item_index)
                 dep_index = tab(index).department_combo.currentIndex()
                 room_index = tab(index).room_combo.currentIndex()
-                load_index = tab(index).viewer.currentRow()
                 room = self.env[0].department[dep_index].room[room_index]
-                # Delete load
-                if load_index == tab(index).viewer.count() - 1:
-                    load_index = tab(index).viewer.count()
-                print(room.load_names[load_index])
-                print(room.load[load_index])
-                room.load.pop(load_index)
-                room.load_names.pop(load_index)
+                load = room.load[item_index]
+                name = room.load_names[item_index]
+                room.load.remove(load)
+                room.load_names.remove(name)
 
     # Add to ComboBoxes
     def add_room_combo(self):
