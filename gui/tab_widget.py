@@ -113,7 +113,7 @@ class TabWidget(QWidget):
         # Get current Index from TabWidget and set current Index -=1
         index = self.tabs.currentIndex()
         if index == len(self.tab_classes) - 1:
-            self.create_directory()
+            self.create_export_directory()
         elif index < len(self.tab_classes):
             self.tabs.setCurrentIndex(index + 1)
 
@@ -213,13 +213,13 @@ class TabWidget(QWidget):
         index = self.tabs.currentIndex()
         if index == 1:
             # Tab Hospital
-            self.create_env()
+            self.save_env()
             gui_func.enable_widget(widget=[self.save_btn], enable=False)
         elif index == 2:
             # Tab Department
             if isinstance(self.env[0], Environment):
                 # Run function create department
-                self.create_department()
+                self.save_department()
             else:
                 print('Setup Hospital data before creating department.')
         elif index == 3:
@@ -227,17 +227,17 @@ class TabWidget(QWidget):
             if len(self.env[0].department) == 0:
                 print('Create department before creating rooms')
             else:
-                self.create_room()
+                self.save_room()
         elif index == 4:
             # Tab Consumer
             dep_index = self.tabs.widget(4).department_combo.currentIndex()
             if len(self.env[0].department[dep_index].room) == 0:
                 print('Create rooms before creating consumers')
             else:
-                self.create_load()
+                self.save_load()
 
     # Create Hospital
-    def create_env(self):
+    def save_env(self):
         """
         Create Environment from User Input in hospital tab
         :return: None
@@ -266,9 +266,9 @@ class TabWidget(QWidget):
             gui_func.enable_widget(widget=[self.tabs.widget(2), self.tabs.widget(5)], enable=True)
 
     # Create Department
-    def create_department(self):
+    def save_department(self):
         """
-        Get parameters and run create_department from Environment obj
+        Get parameters and run save_department from Environment obj
         :return: None
         """
         tab = self.tabs.widget
@@ -293,7 +293,7 @@ class TabWidget(QWidget):
         gui_func.enable_widget(widget=[self.tabs.widget(3)], enable=True)
 
     # Create Room
-    def create_room(self):
+    def save_room(self):
         """
         Run function individual/standard room based on selection in room type combobox
         :return: None
@@ -350,7 +350,7 @@ class TabWidget(QWidget):
         t_start = dep.t_start
         t_end = dep.t_end
         # Find standard csv-file
-        # root = sys.path[1]
+        root = sys.path[1]
         root = 'C:/Users/Rummeny/PycharmProjects/hospital_load_model'  # TODO: Remove Statement (just to be able to run debugger)
         room_name = tab.standard_combo.currentText()
         room_name = room_name.lower()
@@ -371,7 +371,7 @@ class TabWidget(QWidget):
         self.create_standard_room_load(dep_index=dep_index, root=root, standard_room=standard_room)
 
     # Create Load
-    def create_load(self):
+    def save_load(self):
         """
         Get room parameters and create Load object in selected Department/Room
         :return: None
@@ -556,12 +556,12 @@ class TabWidget(QWidget):
         return data
 
     # Export data
-    def create_directory(self):
+    def create_export_directory(self):
         """
         Create export directory
         :return: None
         """
-        # root = sys.path[1]
+        root = sys.path[1]
         root = 'C:/Users/Rummeny/PycharmProjects/hospital_load_model'  # TODO: Remove Statement
         env = self.env[0]
         # Hospital directory

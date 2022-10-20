@@ -118,7 +118,9 @@ class Room:
 
 
 class Load:
+    """
 
+    """
     def __init__(self,
                  env=None,
                  name: str = None,
@@ -136,7 +138,6 @@ class Load:
             self.t_start = dt.datetime.combine(self.env.time_series.iloc[0].date(), self.on)
             self.t_end = dt.datetime.combine(self.env.time_series.iloc[-1].date(), self.off)
             self.operating_hour = self.data.get('operating_hour')
-            print(type(self.operating_hour))
         elif self.load_type == 'sequential':
             self.on = self.data.get('on')
             self.off = self.data.get('off')
@@ -169,6 +170,7 @@ class Load:
             self.cycle_load_profile()
 
     def constant_load_profile(self):
+        # TODO: check why some constant loads are not displayed
         """
         Create load profile for constant loads
         :return: None
@@ -178,7 +180,6 @@ class Load:
         env_start = self.env.time_series.iloc[0]
         env_end = self.env.time_series.iloc[-1]
         if self.operating_hour == False:
-            print(11)
             self.load_profile[self.name + ' power [W]'] = self.power
         else:
             # Add random start/end time (max. +- 15 min)
@@ -201,7 +202,7 @@ class Load:
         """
         i_start = self.on.hour * 60 + self.on.minute
         i_end = self.off.hour * 60 + self.off.minute
-        time_diff = dt.timedelta(minutes=random.randrange(0, self.interval_open, 1))
+        time_diff = dt.timedelta(minutes=random.randrange(0, self.interval_close, 1))
         # close sequences
         for i in range(0, len(self.load_profile.index), self.interval_close):
             if len(self.load_profile.index) - i < self.cycle_length:
@@ -209,18 +210,19 @@ class Load:
             else:
                 for k in range(self.cycle_length):
                     index = self.load_profile.index
-                    self.load_profile.loc[index[i] + time_diff:index[i + k] + time_diff,
-                    self.name + ' power [W]'] = self.power
+                    self.load_profile.loc[index[i] + time_diff:index[i + k] + time_diff, self.name + ' power [W]'] \
+                        = self.power
         # Overwrite open sequences with standby
         self.load_profile.loc[self.t_start:self.t_end, self.name + ' power [W]'] = self.standby
         # open sequence
+        i_time_diff = random.randrange(0, self.interval_open, 1)
+        time_diff = dt.timedelta(minutes=i_time_diff)
         for i in range(i_start, i_end, self.interval_open):
-            if len(self.load_profile.index) - i < self.cycle_length:
+            if len(self.load_profile.index) - i - i_time_diff < self.cycle_length:
                 pass
             else:
                 for k in range(self.cycle_length):
-                    self.load_profile.loc[self.load_profile.index[i + k], self.name + ' power [W]'] = self.power
-
+                    self.load_profile.loc[self.load_profile.index[i + k + i_time_diff], self.name + ' power [W]'] = self.power
         # Fill nan values with standby
         self.load_profile[self.name + ' power [W]'] = self.load_profile[self.name + ' power [W]'].fillna(self.standby)
 
