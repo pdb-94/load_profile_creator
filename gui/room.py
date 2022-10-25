@@ -20,7 +20,6 @@ class Room(QWidget):
         self.room = QLabel('Room Type')
         self.name = QLabel('Name')
         self.department = QLabel('Department')
-        self.time = QLabel('Time Data')
         self.start_time = QLabel('Opening time')
         self.end_time = QLabel('Closing time')
         overview = "Overview \n(Shows all rooms in\ncurrently selected\ndepartment.)"
@@ -58,7 +57,7 @@ class Room(QWidget):
         self.viewer = QListWidget()
 
         # Widget containers
-        self.individual_widget = [self.start_time, self.time, self.end_time, self.start_time_edit, self.end_time_edit]
+        self.individual_widget = [self.start_time, self.end_time, self.start_time_edit, self.end_time_edit]
         self.standard_widget = [self.standard, self.standard_combo]
 
         # Set up Layout
@@ -69,7 +68,6 @@ class Room(QWidget):
         self.layout.addWidget(self.name_edit, 1, 1)
         self.layout.addWidget(self.department, 2, 0)
         self.layout.addWidget(self.department_combo, 2, 1)
-        self.layout.addWidget(self.time, 3, 0)
         self.layout.addWidget(self.standard, 3, 0)
         self.layout.addWidget(self.standard_combo, 3, 1)
         self.layout.addWidget(self.start_time, 4, 0)
@@ -91,7 +89,5 @@ class Room(QWidget):
             for i_widget in self.individual_widget:
                 i_widget.show()
         elif self.room_type.currentIndex() == 1:
-            for i_widget in self.individual_widget:
-                i_widget.hide()
             for s_widget in self.standard_widget:
                 s_widget.show()

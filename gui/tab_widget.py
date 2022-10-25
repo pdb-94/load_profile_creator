@@ -348,8 +348,13 @@ class TabWidget(QWidget):
         name = tab.name_edit.text()
         # Time data from department
         dep = self.env[0].department[dep_index]
-        t_start = dep.t_start
-        t_end = dep.t_end
+        # Time data
+        start_str = tab.start_time_edit.text()
+        end_str = tab.end_time_edit.text()
+        start = gui_func.convert_time(text=start_str)
+        end = gui_func.convert_time(text=end_str)
+        t_start = dt.time(hour=start[0], minute=start[1])
+        t_end = dt.time(hour=end[0], minute=end[1])
         # Find standard csv-file
         root = sys.path[1]
         root = 'C:/Users/Rummeny/PycharmProjects/hospital_load_model'  # TODO: Remove Statement (just to be able to run debugger)
@@ -426,8 +431,8 @@ class TabWidget(QWidget):
             interval_open = standard_room.loc[i, 'interval (open)']
             interval_close = standard_room.loc[i, 'interval (closed)']
             operating_hour = standard_room.loc[i, 'operating hour']
-            on = self.env[0].department[dep_index].t_start
-            off = self.env[0].department[dep_index].t_end
+            on = self.env[0].department[dep_index].room[-1].t_start
+            off = self.env[0].department[dep_index].room[-1].t_end
             # Build data dictionary depending on load_type
             if load_type == 'constant':
                 data = {'load_type': load_type, 'power [W]': power, 'standby [W]': standby, 'on': on, 'off': off,

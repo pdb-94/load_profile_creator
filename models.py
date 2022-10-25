@@ -119,7 +119,7 @@ class Room:
 
 class Load:
     """
-
+    Class to create load objects
     """
 
     def __init__(self,
