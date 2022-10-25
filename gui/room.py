@@ -39,7 +39,14 @@ class Room(QWidget):
         self.room_type.addItems(rooms)
         self.room_type.currentIndexChanged.connect(self.change_layout)
         self.standard_combo = QComboBox()
-        standard_rooms = ['Consulting Room', 'Hallway', 'Kitchen', 'Office', 'Ward', 'Washroom']
+        # standard_rooms = ['Consulting Room', 'Hallway', 'Kitchen', 'Office', 'Ward', 'Washroom']
+        standard_rooms = ['Accounts Office', 'Administration Office', 'Administrator', 'Biostars Account',
+                          'Consulting R1', 'Consulting R2', 'Consulting R3', 'Consulting R4', 'Consulting R5',
+                          'Consulting R6', 'Consulting R7', 'Consulting R8', 'Corridor', 'Dispensary', 'Doctors Room',
+                          'Emergency Consulting', 'Emergency Ward', 'Financial Controller', 'Head Finance',
+                          'Human Resources', 'Insurance Office', 'Internal Audit', 'Manufacturing Office',
+                          'Medical Director', 'Nursing Administration', 'Office', 'OPD Screening Room', 'Pay Office',
+                          'Pharmacy Office', 'Pharmacy Store', 'Records Department', 'Work Shop']
         self.standard_combo.addItems(standard_rooms)
         self.standard_combo.hide()
 

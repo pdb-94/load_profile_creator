@@ -121,6 +121,7 @@ class Load:
     """
 
     """
+
     def __init__(self,
                  env=None,
                  name: str = None,
@@ -175,8 +176,8 @@ class Load:
         Create load profile for constant loads
         :return: None
         """
-        start_diff = dt.timedelta(minutes=random.randrange(-15, 15, 1))
-        end_diff = dt.timedelta(minutes=random.randrange(-15, 15, 1))
+        start_diff = dt.timedelta(minutes=random.randrange(-30, 30, 1))
+        end_diff = dt.timedelta(minutes=random.randrange(-30, 30, 1))
         env_start = self.env.time_series.iloc[0]
         env_end = self.env.time_series.iloc[-1]
         if self.operating_hour == False:
@@ -202,7 +203,7 @@ class Load:
         """
         i_start = self.on.hour * 60 + self.on.minute
         i_end = self.off.hour * 60 + self.off.minute
-        time_diff = dt.timedelta(minutes=random.randrange(0, self.interval_close, 1))
+        time_diff = dt.timedelta(minutes=random.randrange(0, self.interval_close+self.cycle_length, 1))
         # close sequences
         for i in range(0, len(self.load_profile.index), self.interval_close):
             if len(self.load_profile.index) - i < self.cycle_length:
@@ -215,14 +216,14 @@ class Load:
         # Overwrite open sequences with standby
         self.load_profile.loc[self.t_start:self.t_end, self.name + ' power [W]'] = self.standby
         # open sequence
-        i_time_diff = random.randrange(0, self.interval_open, 1)
-        time_diff = dt.timedelta(minutes=i_time_diff)
+        i_time_diff = random.randrange(0, self.interval_open+self.cycle_length, 1)
         for i in range(i_start, i_end, self.interval_open):
             if len(self.load_profile.index) - i - i_time_diff < self.cycle_length:
                 pass
             else:
                 for k in range(self.cycle_length):
-                    self.load_profile.loc[self.load_profile.index[i + k + i_time_diff], self.name + ' power [W]'] = self.power
+                    self.load_profile.loc[
+                        self.load_profile.index[i + k + i_time_diff], self.name + ' power [W]'] = self.power
         # Fill nan values with standby
         self.load_profile[self.name + ' power [W]'] = self.load_profile[self.name + ' power [W]'].fillna(self.standby)
 
@@ -241,11 +242,10 @@ class Load:
             else:
                 time = i
             # Check if Status is turned on
-            if time < len(index):
-                if self.load_profile.loc[index[time], self.name + ' power [W]'] == True:
-                    # Check if cycle is longer than index
-                    if time + cycle_length < len(index):
-                        self.load_profile.loc[index[time]:index[time + cycle_length - 1]] = self.cycle.values
+            if self.load_profile.loc[index[i], self.name + ' power [W]'] == True:
+                # Check if cycle is longer than index
+                if time + cycle_length < len(index):
+                    self.load_profile.loc[index[time]:index[time + cycle_length - 1]] = self.cycle.values
         # Replace False values with standby
         self.load_profile[self.name + ' power [W]'] = self.load_profile[self.name + ' power [W]'].replace(False,
                                                                                                           self.standby)

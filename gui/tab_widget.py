@@ -8,6 +8,7 @@ Main  GUI module of Load Profile Creator (LPC)
 __version__ = '0.1'
 __author__ = 'pdb-94'
 
+import random
 import sys
 import os
 import numpy as np
@@ -356,7 +357,7 @@ class TabWidget(QWidget):
         room_name = room_name.lower()
         room_name = room_name.replace(' ', '_')
         file = room_name + '.csv'
-        path = root + '/data/room/' + file
+        path = root + '/data/room/Masterarbeit/' + file
         standard_room = pd.read_csv(path, sep=';', decimal=',')
         # Create room object in selected Department in Environment
         self.env[0].department[dep_index].create_room(name=name,
