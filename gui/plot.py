@@ -9,6 +9,7 @@ import datetime as dt
 import numpy as np
 import pandas as pd
 import matplotlib
+import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 
 matplotlib.use('Qt5Agg')
@@ -31,8 +32,10 @@ class Plot(FigureCanvasQTAgg):
         if self.time_series is not None:
             self.ax.plot(self.time_series, self.df)
             x_ticks = np.arange(self.time_series.iloc[0],
-                                self.time_series.iloc[-1]+dt.timedelta(hours=2),
-                                dt.timedelta(hours=2)).astype(dt.datetime)
+                                self.time_series.iloc[-1] + dt.timedelta(hours=2),
+                                step=dt.timedelta(hours=2)).astype(dt.datetime)
+            xfmt = mdates.DateFormatter('%d-%m-%y %H:%M')
+            self.ax.xaxis.set_major_formatter(xfmt)
             self.ax.set(xlabel='Time [HH:MM]', ylabel='Power [W]')
             plt.xticks(x_ticks, rotation=45)
 
