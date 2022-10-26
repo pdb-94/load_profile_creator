@@ -442,8 +442,9 @@ class TabWidget(QWidget):
                         'cycle_length': cycle_length, 'interval_open': interval_open,
                         'interval_close': interval_close, 'on': on, 'off': off, 'room': 'standard'}
             else:
-                cycle = root + '/data/load/' + load[i].lower() + '_cycle.csv'
-                profile = root + '/data/load/' + load[i].lower() + '_profile.csv'
+                load[i] = load[i].replace(' ', '_')
+                cycle = root + '/data/load/cycle/' + load[i].lower() + '_cycle.csv'
+                profile = root + '/data/load/profile/' + load[i].lower() + '_profile.csv'
                 data = {'load_type': load_type, 'power [W]': power, 'standby [W]': standby,
                         'cycle_length': cycle_length, 'profile': profile, 'cycle': cycle, 'room': 'standard'}
             # Rename loads if quantity > 1
@@ -571,6 +572,7 @@ class TabWidget(QWidget):
         root = 'C:/Users/Rummeny/PycharmProjects/hospital_load_model'  # TODO: Remove Statement
         env = self.env[0]
         # Hospital directory
+        env.name = env.name.replace('/', '_')
         hospital_directory = '/' + str(env.name + '_load_profile')
         directory = root + hospital_directory
         if not os.path.exists(directory):
@@ -579,6 +581,7 @@ class TabWidget(QWidget):
         self.export_data(load=env, path=directory)
         for i in range(len(env.department)):
             dep = env.department[i]
+            dep.name = dep.name.replace('/', '_')
             dep_dir = '/' + dep.name + '_load_profile'
             directory = root + hospital_directory + dep_dir
             if not os.path.exists(directory):
@@ -587,6 +590,7 @@ class TabWidget(QWidget):
             self.export_data(load=dep, path=directory)
             for k in range(len(dep.room)):
                 room = dep.room[k]
+                room.name = room.name.replace('/', '_')
                 room_dir = '/' + room.name + '_load_profile'
                 directory = root + hospital_directory + dep_dir + room_dir
                 if not os.path.exists(directory):
@@ -595,6 +599,7 @@ class TabWidget(QWidget):
                 self.export_data(load=room, path=directory)
                 for j in range(len(room.load)):
                     load = room.load[j]
+                    load.name = load.name.replace('/', '_')
                     load_dir = '/' + load.name + '_load_profile'
                     directory = root + hospital_directory + dep_dir + room_dir + load_dir
                     if not os.path.exists(directory):
@@ -611,6 +616,7 @@ class TabWidget(QWidget):
             export_path
         :return: None
         """
+        load.name = load.name.replace('/', '_')
         load.load_profile.to_csv(path + '/' + load.name + '.csv', sep=';', decimal=',')
 
     # Delete objects
