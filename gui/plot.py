@@ -15,14 +15,12 @@ import matplotlib.pyplot as plt
 matplotlib.use('Qt5Agg')
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT as NavigationToolbar
 
-# TODO: show time on x-axis not date
-
 
 class Plot(FigureCanvasQTAgg):
     """
     Class containing plot
     """
-    def __init__(self, df: pd.Series = None, time_series: pd.Series = None, parent=None, width=5, height=4, dpi=100):
+    def __init__(self, df: pd.Series = None, time_series: pd.Series = None, parent=None, width=5, height=3, dpi=100):
         self.fig, self.ax = plt.subplots(figsize=(width, height), dpi=dpi)
 
         super().__init__(self.fig)
@@ -34,7 +32,10 @@ class Plot(FigureCanvasQTAgg):
             x_ticks = np.arange(self.time_series.iloc[0],
                                 self.time_series.iloc[-1] + dt.timedelta(hours=2),
                                 step=dt.timedelta(hours=2)).astype(dt.datetime)
-            xfmt = mdates.DateFormatter('%d-%m-%y %H:%M')
+            if len(self.df.index) > 1440:
+                xfmt = mdates.DateFormatter('%d-%m-%y %H:%M')
+            else:
+                xfmt = mdates.DateFormatter('%H:%M')
             self.ax.xaxis.set_major_formatter(xfmt)
             self.ax.set(xlabel='Time [HH:MM]', ylabel='Power [W]')
             plt.xticks(x_ticks, rotation=45)
