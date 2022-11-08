@@ -1,0 +1,4 @@
+﻿quantity;device;manufacturer;model;group;priority;type;room;power [W];standby [W];cycle length;interval (open);interval (closed);operating hour;source
+1;TV;;;Office;C;constant;standard;50;0;;;;False;EnerSHelF measured data
+2;Light;;;Lighting;C;constant;standard;20;0;;;;False;EnerSHelF measured data
+1;Ceiling Fan;;;Technical;C;constant;standard;60;0;;;;False;EnerSHelF measured data

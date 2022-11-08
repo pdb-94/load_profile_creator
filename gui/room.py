@@ -43,7 +43,7 @@ class Room(QWidget):
                           'Consulting R1', 'Consulting R2', 'Consulting R3', 'Consulting R4', 'Consulting R5',
                           'Consulting R6', 'Consulting R7', 'Consulting R8', 'Corridor', 'Dispensary', 'Doctors Room',
                           'Emergency Consulting', 'Emergency Ward', 'Financial Controller', 'Head Finance',
-                          'Human Resources', 'Insurance Office', 'Internal Audit', 'Manufacturing Office',
+                          'Human Resources', 'Insurance Office', 'Internal Audit', 'Manufacturing Room',
                           'Medical Director', 'Nursing Administration', 'Office', 'OPD Screening Room', 'Pay Office',
                           'Pharmacy Office', 'Pharmacy Store', 'Records Department', 'Work Shop']
         self.standard_combo.addItems(standard_rooms)

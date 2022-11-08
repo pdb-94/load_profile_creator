@@ -204,7 +204,7 @@ class Load:
         i_end = self.off.hour * 60 + self.off.minute
         time_diff = dt.timedelta(minutes=random.randrange(0, self.interval_close, 1))
         # close sequences
-        for i in range(0, len(self.load_profile.index), self.interval_close):
+        for i in range(0, len(self.load_profile.index), self.interval_close+self.cycle_length):
             if len(self.load_profile.index) - i < self.cycle_length:
                 pass
             else:
@@ -216,7 +216,7 @@ class Load:
         self.load_profile.loc[self.t_start:self.t_end, self.name + ' power [W]'] = self.standby
         # open sequence
         i_time_diff = random.randrange(0, self.interval_open, 1)
-        for i in range(i_start, i_end, self.interval_open):
+        for i in range(i_start, i_end, self.interval_open+self.cycle_length):
             if len(self.load_profile.index) - i - i_time_diff < self.cycle_length:
                 pass
             else:

@@ -1,0 +1,3 @@
+﻿quantity;device;manufacturer;model;group;priority;type;room;power [W];standby [W];cycle length;interval (open);interval (closed);operating hour;source
+1;Light;;;Lighting;C;constant;standard;20;0;;;;False;EnerSHelF measured data
+2;Pump;;;Technical;C;sequential;standard;20;0;5;120;30;False;Assumption
