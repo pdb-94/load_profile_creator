@@ -39,4 +39,3 @@ class Plot(FigureCanvasQTAgg):
             self.ax.xaxis.set_major_formatter(xfmt)
             self.ax.set(xlabel='Time [HH:MM]', ylabel='Power [W]')
             plt.xticks(x_ticks, rotation=45)
-

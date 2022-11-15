@@ -336,7 +336,6 @@ class TabWidget(QWidget):
         gui_func.enable_widget(widget=[self.tabs.widget(4)], enable=True)
 
     def create_standard_room(self, dep_index):
-        # TODO: Complete Rooms
         """
         Get standard room parameters and create room object in selected Department
         :param dep_index: int
@@ -357,7 +356,6 @@ class TabWidget(QWidget):
         t_end = dt.time(hour=end[0], minute=end[1])
         # Find standard csv-file
         root = sys.path[1]
-        root = 'C:/Users/Rummeny/PycharmProjects/hospital_load_model'  # TODO: Remove Statement (just to be able to run debugger)
         room_name = tab.standard_combo.currentText()
         room_name = room_name.lower()
         room_name = room_name.replace(' ', '_')

@@ -79,7 +79,6 @@ class Environment:
 
         """
         root = sys.path[1]
-        root = 'C:/Users/Rummeny/PycharmProjects/hospital_load_model'  # TODO: Remove Statement
         df = pd.read_csv(root + '/data/database.csv', sep=';', decimal=',')
 
         return df
@@ -89,8 +88,7 @@ class Environment:
         Import default rooms
         :return:
         """
-        # root = sys.path[1]
-        root = 'C:/Users/Rummeny/PycharmProjects/hospital_load_model'  # TODO: Remove Statement
+        root = sys.path[1]
         directory = '/data/room'
         files = next(os.walk(root+directory), (None, None, []))[2]
         csv_files = [file for file in files if file.endswith('.csv')]

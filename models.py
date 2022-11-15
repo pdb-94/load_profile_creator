@@ -6,7 +6,6 @@ Module including Classes Department, Room and Load
 """
 
 import numpy as np
-from os.path import exists
 import pandas as pd
 import datetime as dt
 import random
@@ -191,9 +190,9 @@ class Load:
                 load_end = self.t_end
             else:
                 load_end = self.t_end + end_diff
-                # Build load profile using power/standby and load_start/load_end
-                self.load_profile[self.name + ' power [W]'] = self.standby
-                self.load_profile.loc[load_start:load_end, self.name + ' power [W]'] = self.power
+            # Build load profile using power/standby and load_start/load_end
+            self.load_profile[self.name + ' power [W]'] = self.standby
+            self.load_profile.loc[load_start:load_end, self.name + ' power [W]'] = self.power
 
     def sequential_load_profile(self):
         """
