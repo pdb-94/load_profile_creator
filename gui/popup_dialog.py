@@ -5,7 +5,6 @@ Module with GUI PopUps
 @contributor: Paul Bohn
 """
 
-import sys
 from PyQt5.QtWidgets import *
 
 

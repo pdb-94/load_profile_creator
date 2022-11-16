@@ -9,7 +9,6 @@ __version__ = '0.1'
 __author__ = 'pdb-94'
 
 
-import pandas as pd
 from PyQt5.QtWidgets import *
 from gui.plot import *
 

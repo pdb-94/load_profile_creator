@@ -8,7 +8,6 @@ Main  GUI module of Load Profile Creator (LPC)
 __version__ = '0.1'
 __author__ = 'pdb-94'
 
-import random
 import sys
 import os
 import numpy as np
@@ -346,8 +345,6 @@ class TabWidget(QWidget):
         # Name
         name = tab.name_edit.text()
         # Time data from department
-        dep = self.env[0].department[dep_index]
-        # Time data
         start_str = tab.start_time_edit.text()
         end_str = tab.end_time_edit.text()
         start = gui_func.convert_time(text=start_str)
@@ -567,7 +564,6 @@ class TabWidget(QWidget):
         :return: None
         """
         root = sys.path[1]
-        root = 'C:/Users/Rummeny/PycharmProjects/hospital_load_model'  # TODO: Remove Statement
         env = self.env[0]
         # Hospital directory
         env.name = env.name.replace('/', '_')

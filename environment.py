@@ -93,7 +93,7 @@ class Environment:
         files = next(os.walk(root+directory), (None, None, []))[2]
         csv_files = [file for file in files if file.endswith('.csv')]
         for file in csv_files:
-            self.standard_room.append(pd.read_csv(root + directory + '/' + file, sep=';', decimal=','))#
+            self.standard_room.append(pd.read_csv(root + directory + '/' + file, sep=';', decimal=','))
 
     def clear_load_profile(self):
         for col in self.load_profile.columns:
