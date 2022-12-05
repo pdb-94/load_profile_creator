@@ -353,6 +353,7 @@ class TabWidget(QWidget):
         t_end = dt.time(hour=end[0], minute=end[1])
         # Find standard csv-file
         root = sys.path[1]
+        root = 'C:/Users/Rummeny/PycharmProjects/hospital_load_model'
         room_name = tab.standard_combo.currentText()
         room_name = room_name.lower()
         room_name = room_name.replace(' ', '_')
@@ -564,6 +565,8 @@ class TabWidget(QWidget):
         :return: None
         """
         root = sys.path[1]
+        root = 'C:/Users/Rummeny/PycharmProjects/hospital_load_model'
+        print(root)
         env = self.env[0]
         # Hospital directory
         env.name = env.name.replace('/', '_')

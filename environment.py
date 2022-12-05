@@ -79,6 +79,7 @@ class Environment:
 
         """
         root = sys.path[1]
+        root = 'C:/Users/Rummeny/PycharmProjects/hospital_load_model'
         df = pd.read_csv(root + '/data/database.csv', sep=';', decimal=',')
 
         return df

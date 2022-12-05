@@ -202,26 +202,46 @@ class Load:
         i_start = self.on.hour * 60 + self.on.minute
         i_end = self.off.hour * 60 + self.off.minute
         time_diff = dt.timedelta(minutes=random.randrange(0, self.interval_close, 1))
-        # close sequences
-        for i in range(0, len(self.load_profile.index), self.interval_close+self.cycle_length):
-            if len(self.load_profile.index) - i < self.cycle_length:
+        # close sequence
+        normal_interval_close = int(np.random.normal(loc=self.interval_close, scale=5, size=None))
+        for i in range(0, len(self.load_profile.index), int(np.random.normal(loc=self.interval_close, scale=5, size=None))+self.cycle_length):
+            # Change cycle length with normal deviation
+            normal_cycle_length = int(np.random.normal(loc=self.cycle_length, scale=2, size=None))
+            normal_interval_close = int(np.random.normal(loc=self.interval_close, scale=5, size=None))
+            power = int(np.random.normal(loc=self.power, scale=1, size=None))
+            if power > self.power:
+                power = self.power
+            # Vary i by replacing standard cycle length and interval with normalized cycle_length and interval
+            i = i - self.cycle_length - self.interval_close + normal_interval_close + normal_cycle_length
+            if len(self.load_profile.index) - i < normal_cycle_length:
                 pass
             else:
-                for k in range(self.cycle_length):
+                for k in range(normal_cycle_length):
+                    # Change power with normal deviation
                     index = self.load_profile.index
                     self.load_profile.loc[index[i] + time_diff:index[i + k] + time_diff, self.name + ' power [W]'] \
-                        = self.power
+                        = power
         # Overwrite open sequences with standby
         self.load_profile.loc[self.t_start:self.t_end, self.name + ' power [W]'] = self.standby
         # open sequence
         i_time_diff = random.randrange(0, self.interval_open, 1)
-        for i in range(i_start, i_end, self.interval_open+self.cycle_length):
-            if len(self.load_profile.index) - i - i_time_diff < self.cycle_length:
+        normal_interval_open = int(np.random.normal(loc=self.interval_open, scale=5, size=None))
+        for i in range(i_start, i_end, normal_interval_open+self.cycle_length):
+            # Change cycle length with normal deviation
+            normal_interval_open = int(np.random.normal(loc=self.interval_open, scale=5, size=None))
+            normal_cycle_length = int(np.random.normal(loc=self.cycle_length, scale=2, size=None))
+            # Change power with normal deviation
+            power = int(np.random.normal(loc=self.power, scale=1, size=None))
+            if power > self.power:
+                power = self.power
+            # Vary i by replacing standard cycle length and interval with normalized cycle_length and interval
+            i = i - self.cycle_length - self.interval_open + normal_interval_open + normal_cycle_length
+            if len(self.load_profile.index) - i - i_time_diff < normal_cycle_length:
                 pass
             else:
-                for k in range(self.cycle_length):
+                for k in range(normal_cycle_length):
                     self.load_profile.loc[
-                        self.load_profile.index[i + k + i_time_diff], self.name + ' power [W]'] = self.power
+                        self.load_profile.index[i + k + i_time_diff], self.name + ' power [W]'] = power
         # Fill nan values with standby
         self.load_profile[self.name + ' power [W]'] = self.load_profile[self.name + ' power [W]'].fillna(self.standby)
 
