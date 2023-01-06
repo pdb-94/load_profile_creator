@@ -54,9 +54,12 @@ class Environment:
         """
         Create department in self.department
         :param name: str
+            department name
         :param t_end: dt.time
+            opening hours
         :param t_start: dt.time
-        :return:
+            closing hours
+        :return: None
         """
         self.department.append(md.Department(env=self, name=name, t_start=t_start, t_end=t_end))
         self.department_names.append(name)
@@ -76,7 +79,6 @@ class Environment:
         """
         Import load data base
         :return: df
-
         """
         root = sys.path[1]
         root = 'C:/Users/Rummeny/PycharmProjects/hospital_load_model'
@@ -104,7 +106,7 @@ class Environment:
         """
         Call functions to summarize load profiles
         :return: None
-        """#
+        """
         if len(self.department) == 0:
             return
         for i in range(len(self.department)):
@@ -122,12 +124,10 @@ class Environment:
 
     def create_export_dir(self):
         """
-                Create export directory
-                :return: None
-                """
+        Create export directory
+        :return: None
+        """
         root = sys.path[1]
-        root = 'C:/Users/Rummeny/PycharmProjects/hospital_load_model'
-        print(root)
         # Hospital directory
         self.name = self.name.replace('/', '_')
         hospital_directory = '/' + str(self.name + '_load_profile')
@@ -175,7 +175,6 @@ class Environment:
         """
         load.name = load.name.replace('/', '_')
         load.load_profile.to_csv(path + '/' + load.name + '.csv', sep=';', decimal=',')
-
 
 
 if __name__ == '__main__':

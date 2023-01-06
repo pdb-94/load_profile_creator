@@ -76,7 +76,6 @@ class Department:
         self.room.append(Room(env=self.env, name=name, t_start=t_start, t_end=t_end))
         self.room_names.append(name)
         root = sys.path[1]
-        root = 'C:/Users/Rummeny/PycharmProjects/hospital_load_model'
         file_path = root + path + file
         standard_room = pd.read_csv(file_path, sep=';', decimal=',')
         load = list(standard_room['device'])
