@@ -5,6 +5,7 @@ Module including Classes Department, Room and Load
 @contributor: Paul Bohn
 """
 
+import sys
 import numpy as np
 import pandas as pd
 import datetime as dt
@@ -34,9 +35,12 @@ class Department:
         columns = [name + ' Total Load [W]']
         self.load_profile = pd.DataFrame(index=self.time_series, columns=columns)
 
-    def create_room(self, name: str, t_start: dt.time, t_end: dt.time):
+    def create_room(self, standard: bool, name: str, t_start: dt.time, t_end: dt.time, path: str = None,
+                    file: str = None):
         """
         Create room object in department
+        :param standard: bool
+
         :param name: str
             room name
         :param t_end: dt.time
@@ -45,6 +49,58 @@ class Department:
             room closing time
         :return:
         """
+        if standard is True:
+            self.create_standard_room(name=name, t_start=t_start, t_end=t_end, path=path, file=file)
+        else:
+            self.create_individual_room(name=name, t_start=t_start, t_end=t_end)
+
+    def create_standard_room(self, name: str, t_start: dt.time, t_end: dt.time, path: str, file: str):
+        self.room.append(Room(env=self.env, name=name, t_start=t_start, t_end=t_end))
+        self.room_names.append(name)
+        root = sys.path[1]
+        root = 'C:/Users/Rummeny/PycharmProjects/hospital_load_model'
+        path = root + path + file + '.csv'
+        standard_room = pd.read_csv(path, sep=';', decimal=',')
+        load = list(standard_room['device'])
+        load_quantity = list(standard_room['quantity'])
+        for i in range(len(load)):
+            load_type = standard_room.loc[i, 'type']
+            power = standard_room.loc[i, 'power [W]']
+            standby = standard_room.loc[i, 'standby [W]']
+            cycle_length = standard_room.loc[i, 'cycle length']
+            interval_open = standard_room.loc[i, 'interval (open)']
+            interval_close = standard_room.loc[i, 'interval (closed)']
+            operating_hour = standard_room.loc[i, 'operating hour']
+            on = self.room[-1].t_start
+            off = self.room[-1].t_end
+            # Build data dictionary depending on load_type
+            if load_type == 'constant':
+                data = {'load_type': load_type, 'power [W]': power, 'standby [W]': standby, 'on': on, 'off': off,
+                        'room': 'standard', 'operating_hour': operating_hour}
+            elif load_type == 'sequential':
+                data = {'load_type': load_type, 'power [W]': power, 'standby [W]': standby,
+                        'cycle_length': cycle_length, 'interval_open': interval_open,
+                        'interval_close': interval_close, 'on': on, 'off': off, 'room': 'standard'}
+            else:
+                load[i] = load[i].replace(' ', '_')
+                cycle = root + '/data/load/cycle/' + load[i].lower() + '_cycle.csv'
+                profile = root + '/data/load/profile/' + load[i].lower() + '_profile.csv'
+                data = {'load_type': load_type, 'power [W]': power, 'standby [W]': standby,
+                        'cycle_length': cycle_length, 'profile': profile, 'cycle': cycle, 'room': 'standard'}
+            # Rename loads if quantity > 1
+            for k in range(load_quantity[i]):
+                if load_quantity[i] == 1:
+                    load_name = load[i]
+                else:
+                    load_name = load[i] + ' ' + str(k + 1)
+                room = self.room[-1]
+                # Create load object in room.load
+                room.load.append(Load(env=self.env,
+                                      name=load_name,
+                                      data=data))
+                room.load_names.append(load_name)
+
+    def create_individual_room(self, name: str, t_start: dt.time, t_end: dt.time):
         self.room.append(Room(env=self.env, name=name, t_start=t_start, t_end=t_end))
         self.room_names.append(name)
 
@@ -156,6 +212,7 @@ class Load:
         columns = [name + ' power [W]']
         self.load_profile = pd.DataFrame(index=self.time_series, columns=columns)
         self.create_profile()
+        self.drop()
 
     def create_profile(self):
         """
@@ -203,14 +260,11 @@ class Load:
         i_end = self.off.hour * 60 + self.off.minute
         time_diff = dt.timedelta(minutes=random.randrange(0, self.interval_close, 1))
         # close sequence
-        normal_interval_close = int(np.random.normal(loc=self.interval_close, scale=5, size=None))
-        for i in range(0, len(self.load_profile.index), int(np.random.normal(loc=self.interval_close, scale=5, size=None))+self.cycle_length):
-            # Change cycle length with normal deviation
+        for i in range(0, len(self.load_profile.index),
+                       int(np.random.normal(loc=self.interval_close, scale=5, size=None)) + self.cycle_length):
+            # Change interval_close and cycle_length with normal deviation
             normal_cycle_length = int(np.random.normal(loc=self.cycle_length, scale=2, size=None))
             normal_interval_close = int(np.random.normal(loc=self.interval_close, scale=5, size=None))
-            power = int(np.random.normal(loc=self.power, scale=1, size=None))
-            if power > self.power:
-                power = self.power
             # Vary i by replacing standard cycle length and interval with normalized cycle_length and interval
             i = i - self.cycle_length - self.interval_close + normal_interval_close + normal_cycle_length
             if len(self.load_profile.index) - i < normal_cycle_length:
@@ -218,30 +272,31 @@ class Load:
             else:
                 for k in range(normal_cycle_length):
                     # Change power with normal deviation
+                    power = int(np.random.normal(loc=self.power, scale=self.power * 0.2, size=None))
+                    if power > self.power:
+                        power = self.power
                     index = self.load_profile.index
-                    self.load_profile.loc[index[i] + time_diff:index[i + k] + time_diff, self.name + ' power [W]'] \
-                        = power
+                    self.load_profile.loc[index[i + k] + time_diff, self.name + ' power [W]'] = power
         # Overwrite open sequences with standby
         self.load_profile.loc[self.t_start:self.t_end, self.name + ' power [W]'] = self.standby
         # open sequence
         i_time_diff = random.randrange(0, self.interval_open, 1)
-        normal_interval_open = int(np.random.normal(loc=self.interval_open, scale=5, size=None))
-        for i in range(i_start, i_end, normal_interval_open+self.cycle_length):
-            # Change cycle length with normal deviation
+        for i in range(i_start, i_end, self.interval_open + self.cycle_length):
+            # Change interval_open and cycle_length with normal deviation
             normal_interval_open = int(np.random.normal(loc=self.interval_open, scale=5, size=None))
             normal_cycle_length = int(np.random.normal(loc=self.cycle_length, scale=2, size=None))
-            # Change power with normal deviation
-            power = int(np.random.normal(loc=self.power, scale=1, size=None))
-            if power > self.power:
-                power = self.power
             # Vary i by replacing standard cycle length and interval with normalized cycle_length and interval
             i = i - self.cycle_length - self.interval_open + normal_interval_open + normal_cycle_length
             if len(self.load_profile.index) - i - i_time_diff < normal_cycle_length:
                 pass
             else:
                 for k in range(normal_cycle_length):
-                    self.load_profile.loc[
-                        self.load_profile.index[i + k + i_time_diff], self.name + ' power [W]'] = power
+                    # Change power with normal deviation
+                    power = int(np.random.normal(loc=self.power, scale=self.power * 0.2, size=None))
+                    if power > self.power:
+                        power = self.power
+                    index = self.load_profile.index
+                    self.load_profile.loc[index[i + k + i_time_diff], self.name + ' power [W]'] = power
         # Fill nan values with standby
         self.load_profile[self.name + ' power [W]'] = self.load_profile[self.name + ' power [W]'].fillna(self.standby)
 
@@ -267,3 +322,11 @@ class Load:
         # Replace False values with standby
         self.load_profile[self.name + ' power [W]'] = self.load_profile[self.name + ' power [W]'].replace(False,
                                                                                                           self.standby)
+
+    def drop(self):
+        """
+        Drop if index is to long
+        :return: None
+        """
+        index = self.load_profile.index
+        self.load_profile = self.load_profile[index[0]:index[1439]]

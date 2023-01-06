@@ -303,10 +303,12 @@ class TabWidget(QWidget):
         dep_index = tab.department_combo.currentIndex()
         if tab.room_type.currentIndex() == 0:
             # Individual room
+            data = self.get_inidivdual_room_data(dep_index=dep_index)
             self.create_individual_room(dep_index=dep_index)
         elif tab.room_type.currentIndex() == 1:
             # Standard room
-            self.create_standard_room(dep_index=dep_index)
+            data = self.get_standard_room_data(dep_index=dep_index)
+            self.env[0].department[dep_index].create_room(standard=True, name=)
 
     def create_individual_room(self, dep_index):
         """
@@ -334,7 +336,7 @@ class TabWidget(QWidget):
         gui_func.clear_widget(widget=[tab.name_edit])
         gui_func.enable_widget(widget=[self.tabs.widget(4)], enable=True)
 
-    def create_standard_room(self, dep_index):
+    def get_standard_room_data(self, dep_index):
         """
         Get standard room parameters and create room object in selected Department
         :param dep_index: int
@@ -361,16 +363,19 @@ class TabWidget(QWidget):
         path = root + '/data/room/Masterarbeit/' + file
         standard_room = pd.read_csv(path, sep=';', decimal=',')
         # Create room object in selected Department in Environment
-        self.env[0].department[dep_index].create_room(name=name,
+        self.env[0].department[dep_index].create_room(standard=True,
+                                                      name=name,
                                                       t_start=t_start,
-                                                      t_end=t_end)
+                                                      t_end=t_end,
+                                                      path='/data/room/Masterarbeit/',
+                                                      file=room_name)
         # Add name to viewer
         gui_func.add_to_viewer(widget=tab, item=[name])
         # Clear Input
         gui_func.clear_widget(widget=[tab.name_edit])
         gui_func.enable_widget(widget=[self.tabs.widget(4)], enable=True)
         # Create Loads in Standard room
-        self.create_standard_room_load(dep_index=dep_index, root=root, standard_room=standard_room)
+        # self.create_standard_room_load(dep_index=dep_index, root=root, standard_room=standard_room)
 
     # Create Load
     def save_load(self):
@@ -451,9 +456,10 @@ class TabWidget(QWidget):
                     load_name = load[i] + ' ' + str(k + 1)
                 room = self.env[0].department[dep_index].room[-1]
                 # Create load object in room.load
-                room.load.append(md.Load(env=self.env[0],
-                                         name=load_name,
-                                         data=data))
+                room.create_load(name=load_name, data=data)
+                # room.load.append(md.Load(env=self.env[0],
+                #                          name=load_name,
+                #                          data=data))
                 room.load_names.append(load_name)
 
     def create_constant_load_data(self, dep_index: int, room_index: int):
@@ -564,57 +570,58 @@ class TabWidget(QWidget):
         Create export directory
         :return: None
         """
-        root = sys.path[1]
-        root = 'C:/Users/Rummeny/PycharmProjects/hospital_load_model'
-        print(root)
-        env = self.env[0]
-        # Hospital directory
-        env.name = env.name.replace('/', '_')
-        hospital_directory = '/' + str(env.name + '_load_profile')
-        directory = root + hospital_directory
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-        # Export environment load profile
-        self.export_data(load=env, path=directory)
-        for i in range(len(env.department)):
-            dep = env.department[i]
-            dep.name = dep.name.replace('/', '_')
-            dep_dir = '/' + dep.name + '_load_profile'
-            directory = root + hospital_directory + dep_dir
-            if not os.path.exists(directory):
-                os.makedirs(directory)
-            # Export department load profile
-            self.export_data(load=dep, path=directory)
-            for k in range(len(dep.room)):
-                room = dep.room[k]
-                room.name = room.name.replace('/', '_')
-                room_dir = '/' + room.name + '_load_profile'
-                directory = root + hospital_directory + dep_dir + room_dir
-                if not os.path.exists(directory):
-                    os.makedirs(directory)
-                # Export room load profile
-                self.export_data(load=room, path=directory)
-                for j in range(len(room.load)):
-                    load = room.load[j]
-                    load.name = load.name.replace('/', '_')
-                    load_dir = '/' + load.name + '_load_profile'
-                    directory = root + hospital_directory + dep_dir + room_dir + load_dir
-                    if not os.path.exists(directory):
-                        os.makedirs(directory)
-                    # Export load load profile
-                    self.export_data(load=load, path=directory)
+        self.env[0].create_export_dir()
+        # root = sys.path[1]
+        # root = 'C:/Users/Rummeny/PycharmProjects/hospital_load_model'
+        # print(root)
+        # env = self.env[0]
+        # # Hospital directory
+        # env.name = env.name.replace('/', '_')
+        # hospital_directory = '/' + str(env.name + '_load_profile')
+        # directory = root + hospital_directory
+        # if not os.path.exists(directory):
+        #     os.makedirs(directory)
+        # # Export environment load profile
+        # self.export_data(load=env, path=directory)
+        # for i in range(len(env.department)):
+        #     dep = env.department[i]
+        #     dep.name = dep.name.replace('/', '_')
+        #     dep_dir = '/' + dep.name + '_load_profile'
+        #     directory = root + hospital_directory + dep_dir
+        #     if not os.path.exists(directory):
+        #         os.makedirs(directory)
+        #     # Export department load profile
+        #     self.export_data(load=dep, path=directory)
+        #     for k in range(len(dep.room)):
+        #         room = dep.room[k]
+        #         room.name = room.name.replace('/', '_')
+        #         room_dir = '/' + room.name + '_load_profile'
+        #         directory = root + hospital_directory + dep_dir + room_dir
+        #         if not os.path.exists(directory):
+        #             os.makedirs(directory)
+        #         # Export room load profile
+        #         self.export_data(load=room, path=directory)
+        #         for j in range(len(room.load)):
+        #             load = room.load[j]
+        #             load.name = load.name.replace('/', '_')
+        #             load_dir = '/' + load.name + '_load_profile'
+        #             directory = root + hospital_directory + dep_dir + room_dir + load_dir
+        #             if not os.path.exists(directory):
+        #                 os.makedirs(directory)
+        #             # Export load load profile
+        #             self.export_data(load=load, path=directory)
 
-    def export_data(self, load=None, path: str = None):
-        """
-        Export data
-        :param load: object
-            Environment; Department; Room; Load
-        :param path: str
-            export_path
-        :return: None
-        """
-        load.name = load.name.replace('/', '_')
-        load.load_profile.to_csv(path + '/' + load.name + '.csv', sep=';', decimal=',')
+    # def export_data(self, load=None, path: str = None):
+    #     """
+    #     Export data
+    #     :param load: object
+    #         Environment; Department; Room; Load
+    #     :param path: str
+    #         export_path
+    #     :return: None
+    #     """
+    #     load.name = load.name.replace('/', '_')
+    #     load.load_profile.to_csv(path + '/' + load.name + '.csv', sep=';', decimal=',')
 
     # Delete objects
     def delete(self):
@@ -830,23 +837,24 @@ class TabWidget(QWidget):
         """
         tab = self.tabs.widget(5)
         if isinstance(self.env[0], Environment):
-            env = self.env[0]
-            if len(env.department) == 0:
-                tab.clear_plot()
-                return
-            for i in range(len(env.department)):
-                dep = env.department[i]
-                if len(dep.room) == 0:
-                    tab.clear_plot()
-                    return
-                for k in range(len(dep.room)):
-                    room = dep.room[k]
-                    # Summarize room profile
-                    room.summarize_load_profile()
-                # Summarize department profile
-                dep.summarize_load_profile()
-            # Summarize hospital profile
-            env.summarize_load_profile()
+            self.env[0].summarize_load_profile()
+            # env = self.env[0]
+            # if len(env.department) == 0:
+            #     tab.clear_plot()
+            #     return
+            # for i in range(len(env.department)):
+            #     dep = env.department[i]
+            #     if len(dep.room) == 0:
+            #         tab.clear_plot()
+            #         return
+            #     for k in range(len(dep.room)):
+            #         room = dep.room[k]
+            #         # Summarize room profile
+            #         room.summarize_load_profile()
+            #     # Summarize department profile
+            #     dep.summarize_load_profile()
+            # # Summarize hospital profile
+            # env.summarize_load_profile()
 
 
 if __name__ == '__main__':

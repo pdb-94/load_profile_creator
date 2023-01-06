@@ -100,6 +100,83 @@ class Environment:
         for col in self.load_profile.columns:
             col.drop()
 
+    def build_load_profiles(self):
+        """
+        Call functions to summarize load profiles
+        :return: None
+        """#
+        if len(self.department) == 0:
+            return
+        for i in range(len(self.department)):
+            dep = self.department[i]
+            if len(dep.room) == 0:
+                return
+            for k in range(len(dep.room)):
+                room = dep.room[k]
+                # Summarize room profile
+                room.summarize_load_profile()
+            # Summarize department profile
+            dep.summarize_load_profile()
+        # Summarize hospital profile
+        self.summarize_load_profile()
+
+    def create_export_dir(self):
+        """
+                Create export directory
+                :return: None
+                """
+        root = sys.path[1]
+        root = 'C:/Users/Rummeny/PycharmProjects/hospital_load_model'
+        print(root)
+        # Hospital directory
+        self.name = self.name.replace('/', '_')
+        hospital_directory = '/' + str(self.name + '_load_profile')
+        directory = root + hospital_directory
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        # Export environment load profile
+        self.export_data(load=self, path=directory)
+        for i in range(len(self.department)):
+            dep = self.department[i]
+            dep.name = dep.name.replace('/', '_')
+            dep_dir = '/' + dep.name + '_load_profile'
+            directory = root + hospital_directory + dep_dir
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+            # Export department load profile
+            self.export_data(load=dep, path=directory)
+            for k in range(len(dep.room)):
+                room = dep.room[k]
+                room.name = room.name.replace('/', '_')
+                room_dir = '/' + room.name + '_load_profile'
+                directory = root + hospital_directory + dep_dir + room_dir
+                if not os.path.exists(directory):
+                    os.makedirs(directory)
+                # Export room load profile
+                self.export_data(load=room, path=directory)
+                for j in range(len(room.load)):
+                    load = room.load[j]
+                    load.name = load.name.replace('/', '_')
+                    load_dir = '/' + load.name + '_load_profile'
+                    directory = root + hospital_directory + dep_dir + room_dir + load_dir
+                    if not os.path.exists(directory):
+                        os.makedirs(directory)
+                    # Export load load profile
+                    self.export_data(load=load, path=directory)
+
+    def export_data(self, load=None, path: str = None):
+        """
+        Export data
+        :param load: object
+            Environment; Department; Room; Load
+        :param path: str
+            export_path
+        :return: None
+        """
+        load.name = load.name.replace('/', '_')
+        load.load_profile.to_csv(path + '/' + load.name + '.csv', sep=';', decimal=',')
+
+
 
 if __name__ == '__main__':
     # Create hospital & departments

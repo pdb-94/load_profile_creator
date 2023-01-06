@@ -1,4 +1,5 @@
 ﻿equipment;manufacturer;model;group;priority;type;power [W];standby [W];cycle length;Source
+Air Condition (1.5 kW);;;Technical;B;Sequential;1500;0;;
 Air Condition (1.8 kW);Bruhm;;Technical;B;Sequential;1800;0;;
 Air Condition (3.8 kW);Bruhm;;Technical;B;Sequential;3830;0;;
 Air Dreyer;Nov Air;;Technical;C;Constant;450;0;;
