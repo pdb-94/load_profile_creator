@@ -59,8 +59,8 @@ class Department:
         self.room_names.append(name)
         root = sys.path[1]
         root = 'C:/Users/Rummeny/PycharmProjects/hospital_load_model'
-        path = root + path + file + '.csv'
-        standard_room = pd.read_csv(path, sep=';', decimal=',')
+        file_path = root + path + file
+        standard_room = pd.read_csv(file_path, sep=';', decimal=',')
         load = list(standard_room['device'])
         load_quantity = list(standard_room['quantity'])
         for i in range(len(load)):

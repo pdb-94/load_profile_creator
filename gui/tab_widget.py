@@ -187,10 +187,10 @@ class TabWidget(QWidget):
             if isinstance(self.env[0], Environment):
                 if len(self.env[0].department) > 0:
                     if len(self.env[0].department[0].room) > 0:
-                        pass
-                    else:
                         # Add selected items to ComboBox
-                        gui_func.add_combo(widget=tab.room_combo, name=self.env[0].room[0].load_names)
+                        gui_func.add_combo(widget=tab.room_combo, name=self.env[0].department[0].room[0].load_names)
+                    else:
+                        pass
         elif index == 5:
             # Tab Load profile
             tab = self.tabs.widget(index)
@@ -303,14 +303,22 @@ class TabWidget(QWidget):
         dep_index = tab.department_combo.currentIndex()
         if tab.room_type.currentIndex() == 0:
             # Individual room
-            data = self.get_inidivdual_room_data(dep_index=dep_index)
-            self.create_individual_room(dep_index=dep_index)
+            data = self.get_individual_room_data()
+            self.env[0].department[dep_index].create_room(standard=False,
+                                                          name=data[0],
+                                                          t_start=data[1],
+                                                          t_end=data[2])
         elif tab.room_type.currentIndex() == 1:
             # Standard room
-            data = self.get_standard_room_data(dep_index=dep_index)
-            self.env[0].department[dep_index].create_room(standard=True, name=)
+            data = self.get_standard_room_data()
+            self.env[0].department[dep_index].create_room(standard=True,
+                                                          name=data[0],
+                                                          t_start=data[1],
+                                                          t_end=data[2],
+                                                          path=data[3],
+                                                          file=data[4])
 
-    def create_individual_room(self, dep_index):
+    def get_individual_room_data(self):
         """
         Get individual room parameters and create room object in selected Department
         :param dep_index: int
@@ -326,17 +334,15 @@ class TabWidget(QWidget):
         end = gui_func.convert_time(text=end_str)
         t_start = dt.time(hour=start[0], minute=start[1])
         t_end = dt.time(hour=end[0], minute=end[1])
-        # Create room object in selected Department in Environment
-        self.env[0].department[dep_index].create_room(name=name,
-                                                      t_start=t_start,
-                                                      t_end=t_end)
         # Add name to viewer
         gui_func.add_to_viewer(widget=tab, item=[name])
         # Clear Input
         gui_func.clear_widget(widget=[tab.name_edit])
         gui_func.enable_widget(widget=[self.tabs.widget(4)], enable=True)
 
-    def get_standard_room_data(self, dep_index):
+        return name, t_start, t_end
+
+    def get_standard_room_data(self):
         """
         Get standard room parameters and create room object in selected Department
         :param dep_index: int
@@ -354,28 +360,18 @@ class TabWidget(QWidget):
         t_start = dt.time(hour=start[0], minute=start[1])
         t_end = dt.time(hour=end[0], minute=end[1])
         # Find standard csv-file
-        root = sys.path[1]
-        root = 'C:/Users/Rummeny/PycharmProjects/hospital_load_model'
         room_name = tab.standard_combo.currentText()
         room_name = room_name.lower()
         room_name = room_name.replace(' ', '_')
         file = room_name + '.csv'
-        path = root + '/data/room/Masterarbeit/' + file
-        standard_room = pd.read_csv(path, sep=';', decimal=',')
-        # Create room object in selected Department in Environment
-        self.env[0].department[dep_index].create_room(standard=True,
-                                                      name=name,
-                                                      t_start=t_start,
-                                                      t_end=t_end,
-                                                      path='/data/room/Masterarbeit/',
-                                                      file=room_name)
+        path = '/data/room/Masterarbeit/'
         # Add name to viewer
         gui_func.add_to_viewer(widget=tab, item=[name])
         # Clear Input
         gui_func.clear_widget(widget=[tab.name_edit])
         gui_func.enable_widget(widget=[self.tabs.widget(4)], enable=True)
-        # Create Loads in Standard room
-        # self.create_standard_room_load(dep_index=dep_index, root=root, standard_room=standard_room)
+
+        return name, t_start, t_end, path, file
 
     # Create Load
     def save_load(self):
