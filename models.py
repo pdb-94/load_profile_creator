@@ -40,14 +40,18 @@ class Department:
         """
         Create room object in department
         :param standard: bool
-
+            Standard or individual room
         :param name: str
             room name
         :param t_end: dt.time
             room opening tim
         :param t_start: dt.time
             room closing time
-        :return:
+        :param path: str
+            file dirctory
+        :param file: str
+            file name
+        :return: None
         """
         if standard is True:
             self.create_standard_room(name=name, t_start=t_start, t_end=t_end, path=path, file=file)
@@ -55,6 +59,20 @@ class Department:
             self.create_individual_room(name=name, t_start=t_start, t_end=t_end)
 
     def create_standard_room(self, name: str, t_start: dt.time, t_end: dt.time, path: str, file: str):
+        """
+        Create standard room
+        :param name: str
+            room name
+        :param t_start: dt.time
+            opening hours
+        :param t_end: dt.time
+            closing hours
+        :param path: str
+            file directory
+        :param file: str
+            file name
+        :return: None
+        """
         self.room.append(Room(env=self.env, name=name, t_start=t_start, t_end=t_end))
         self.room_names.append(name)
         root = sys.path[1]
@@ -101,6 +119,16 @@ class Department:
                 room.load_names.append(load_name)
 
     def create_individual_room(self, name: str, t_start: dt.time, t_end: dt.time):
+        """
+        Create individual room
+        :param name: str
+            room name
+        :param t_start: dt.time
+            opening hours
+        :param t_end: dt.time
+            closing hours
+        :return: None
+        """
         self.room.append(Room(env=self.env, name=name, t_start=t_start, t_end=t_end))
         self.room_names.append(name)
 
@@ -124,7 +152,6 @@ class Room:
     """
     Class to create room objects
     """
-
     def __init__(self,
                  env=None,
                  name: str = None,
